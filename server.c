@@ -1,12 +1,8 @@
+#include"my_type.h"
 
-
-typedef struct{
-	char[1024] username;
-	char[1024] password;
-	int online;
-}UserType;
-
-int UserType user;
+UserType user;
+StatusType status; // trang thai he thong
+PlayStatus play_status; // trang thai cua game
 char username[1024];
 char password[1024]; 
 
@@ -41,6 +37,10 @@ int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua clien
 	// 1: dang nhap
 	// 2: tao tai khoan moi
 	// 3: huy ket noi
+	if(status != unauthenticated){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
 	char *p;
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
@@ -49,13 +49,13 @@ int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua clien
 		case 1: // lua chon dang nhap
 		{
 			retry = 0;
-			send("LOGIN")
+			send("LOGIN");
 			return 1; 
 		}
 		case 2: // lua chon dang ki
 		{
 			retry = 0;
-			send("READY_SIGNUP")
+			send("READY_SIGNUP");
 			return 1; 
 		}
 		case 3:
@@ -88,12 +88,18 @@ Find_User(char[1024] string)
 
 int Check_User(char[1024] string, int conn_soc){ // kiem tra khi client gui ve username
 	char *p;
+
+	if(status != unauthenticated){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
 	if(Find_User(username))
 	{
 		send("LOGIN_USER_ID_OK");
+		status = specified_id;/*chuyen qua trang thai xac nhan password */
 		return 1;
 	}
 	else
@@ -113,6 +119,12 @@ int Check_User(char[1024] string, int conn_soc){ // kiem tra khi client gui ve u
 int Check_Login_Pass(char[1024] string, int conn_soc){
 	char *p;
 	char password[1024];
+
+	if(status != specified_id){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
+
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan password ma client gui ve
 	strcpy(password,p); // luu lai pass dang ki cua nguoi dung
@@ -123,6 +135,7 @@ int Check_Login_Pass(char[1024] string, int conn_soc){
 		strcmp(user.password,password);
 		user.online=1;/*dat trang thai user thanh online*/
 		send("LOGIN_SUCCESS");
+		status = authenticated; /*dua he thong ve trang thai da dang nhap*/
 		return 1;
 	}
 	else{
@@ -142,14 +155,25 @@ int Check_Login_Pass(char[1024] string, int conn_soc){
 }
 
 int Ready_Signup(int conn_soc){
+	if(status != unauthenticated){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
 	// Chuan bi cho cong viec dang ki tai khoan moi
 	// Dua bien luu user hien tai ve trang thai rong
+	status = signup; /* cap nhat lai trang thai dang ki */
 	send("READY_SIGNUP");
 	return 1;
 }
 
 int Signup_User(char[1024] string, int conn_soc){
 	char *p;
+
+	if(status != signup){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
+
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
@@ -161,6 +185,7 @@ int Signup_User(char[1024] string, int conn_soc){
 	else
 	{
 		send("SIGNUP_USER_ID_OK");
+		status = enter_password; /*chuuyen qua trang thai nhap password de dang ki*/
 		return 1;
 	}
 }
@@ -169,6 +194,12 @@ int Signup_User(char[1024] string, int conn_soc){
 int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 	char *p;
 	char confirm_password[1024];
+
+	if(status != enter_password){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
+
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
 	if(strlen(p)<6){
@@ -198,6 +229,7 @@ int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 				retry = 0;
 				send("SIGNUP_USER_SUCCESS");/*thong bao cho ben client biet la da tao thanh cong tai khoan*/
 				/*Client: goi lai menu giong luc moi dang nhap vao*/
+				status = unauthenticated; /*dua he thong ve trang thai ban dau*/
 				return 1;
 			}	
 			else{
@@ -218,14 +250,18 @@ int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 }
 
 int Check_Logout(char[1024] recv_data, int conn_soc){
-	if(user.online==0){
-		// nguoi dung chua dang nhap
-		send("LOGOUT_NOT_SUCCESS"); 
-		/* thong bao nguoi dung chua dang nhap
-		va quay lai trang thai nhu khi nhan thong diep HELLO
-		*/
-		return 1;
+	if(status != authenticated){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
 	}
+	// if(user.online==0){
+	// 	// nguoi dung chua dang nhap
+	// 	send("LOGOUT_NOT_SUCCESS"); 
+	// 	 thong bao nguoi dung chua dang nhap
+	// 	va quay lai trang thai nhu khi nhan thong diep HELLO
+		
+	// 	return 1;
+	// }
 	else
 	{
 		Clear();// xoa tai khoan dang dang nhap
@@ -244,7 +280,13 @@ int Exit_Connect(int conn_soc){
 }
 
 int Start_Game(int conn_soc){
+	if(status != authenticated || play_status != not_play){
+		/*phai dang nhap moi choi game duoc*/
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
 	send("GAME_READY"); 
+	play_status = select_color; /*dua game vao trang thai chon mau*/
 	/* nhan duoc thong diep nay client cho nguoi dung chon mau quan co*/
 	return 1;
 }
@@ -252,14 +294,30 @@ int Start_Game(int conn_soc){
 int Check_Color(char[1024] string, int conn_soc){
 	char *p;
 	int number;
+
+	if(status != authenticated || play_status != select_color){
+		/*phai dang nhap moi choi game duoc*/
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
+
 	p = strtok(string,"|");
 	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
 	number = atoi(p);
 	if(number == 1 || number == 0){ // 1: den, 0: trang
+		send("COLOR_OK");
 		/*mau trang di truoc*/
 		if(number == 1){
 			// may se la nguoi danh truoc
+			send("RUN|quan_co|toa_do_hang|toa_do_cot");
+			return 1;
 		}
+		return 1;
+	}
+	else
+	{
+		send("COLOR_ERROR");
+		return 1;
 	}
 	
 }
@@ -319,7 +377,8 @@ int Check_Mess(char[1024] recv_data, int conn_soc){
 int main()
 {
 	int retry=0;
-	
+	status = unauthenticated;
+	play_status = not_play;
 	if(Co yeu cau ket noi tu client){
 		send("HELLO");
 		Check_Send();// kiem tra trang thai gui
@@ -332,8 +391,6 @@ int main()
 				check_status=0;
 			}
 			
-		}while(check_status>0)
-
-		
+		}while(check_status>0);		
 	}
 }
