@@ -1,8 +1,9 @@
-#include"my_type.h"
+#include"ai.h"
 
 UserType user;
 StatusType status; // trang thai he thong
 PlayStatus play_status; // trang thai cua game
+int data[9][9]; //  du lieu ban co
 char username[1024];
 char password[1024]; 
 
@@ -43,7 +44,7 @@ int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua clien
 	}
 	char *p;
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	int check = atoi(p); // lua chon cua client gui ve
 	switch(check){
 		case 1: // lua chon dang nhap
@@ -94,7 +95,7 @@ int Check_User(char[1024] string, int conn_soc){ // kiem tra khi client gui ve u
 		return 0; 
 	}
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
 	if(Find_User(username))
 	{
@@ -126,7 +127,7 @@ int Check_Login_Pass(char[1024] string, int conn_soc){
 	}
 
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan password ma client gui ve
+	p = strtok(NULL,"|"); // lay phan password ma client gui ve
 	strcpy(password,p); // luu lai pass dang ki cua nguoi dung
 	if(strcmp(password,user.password)==0)
 	{
@@ -175,7 +176,7 @@ int Signup_User(char[1024] string, int conn_soc){
 	}
 
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
 	if(Find_User(username))
 	{
@@ -201,7 +202,7 @@ int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 	}
 
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	if(strlen(p)<6){
 		if(retry<5){
 			retry++;
@@ -302,10 +303,11 @@ int Check_Color(char[1024] string, int conn_soc){
 	}
 
 	p = strtok(string,"|");
-	p = strtok(NULL,"\0"); // lay phan du lieu ma client gui ve
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	number = atoi(p);
 	if(number == 1 || number == 0){ // 1: den, 0: trang
 		send("COLOR_OK");
+		play_status = play; /*dat game vao trang thai choi*/
 		/*mau trang di truoc*/
 		if(number == 1){
 			// may se la nguoi danh truoc
@@ -320,6 +322,77 @@ int Check_Color(char[1024] string, int conn_soc){
 		return 1;
 	}
 	
+}
+
+int Check_Run(char[1024] string, int conn_soc){
+	char *p;
+	char chess;// quan co
+	int x; // toa do hang
+	int y; // toa do cot
+	RunType run;
+
+
+	if(status != authenticated || play_status != play){
+		/*phai dang nhap moi choi game duoc*/
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		return 0; 
+	}
+
+	p = strtok(string,"|");
+	p = strtok(NULL,"|");
+	chess = p[0]; // lay quan co tu phia client gui ve
+	p = strtok(NULL,"|");
+	x = atoi(p); // lay toa do hang
+    p = strtok(NULL,"|");
+    y = atoi(p); // lay toa do cot 
+
+    if(check_run(data, chess, x , y)>0){ 
+    	// check_run _ ai.h
+    	//duong di cua phia client la hop le
+    	/*
+    		AI: tinh toan duong di doi pho
+    	*/
+    	run = find_way(data); // ai.h
+    	if(run.status == 0){
+    		send("YOU_WIN"); // client thang
+    		play_status = not_play; /*dua game ve trang thai chua bat dau*/
+    		/**************************
+    		gui file co pho ve phia client
+    		***************************/
+    	}
+    	else
+    	{
+	    	chess = run.chess;
+	    	x = run.x;
+	    	y = run.y;
+	    	if(run.status == 1)
+	    	{
+	    		send("RUN|chess|x|y"); // neu day la nuoc co binh thuong
+	    	}
+	    	if(run.status == 2)
+	    	{
+	    		send("RUN_W|chess|x|y"); // neu day la nuoc co chieu tuong
+	    		/*ben client:
+	    			1: ban choi tiep
+	    			2: ban chiu thua 
+	    		*/
+	    	}
+    	}	
+    }
+    else
+    {
+    	send("RUN_ERROR");
+    	return 1;
+    }
+
+}
+
+int End_Game(int conn_soc){
+	send("COMPUTER_WIN");
+	play_status = not_play; /*dua game ve trang thai chua bat dau*/
+	/**************************
+	gui file co pho ve phia client
+	***************************/
 }
 
 int Check_Mess(char[1024] recv_data, int conn_soc){
@@ -370,7 +443,14 @@ int Check_Mess(char[1024] recv_data, int conn_soc){
 		// nguoi choi da chon mau quan co, bat dau tro choi
 		return Check_Color(recv_data,conn_soc);
 	}
-	
+	if(strcmp(p,"RUN")==0){
+		// nhan nuoc co tu phia client
+		return Check_Run(recv_data,conn_soc);
+	}
+	if(strcmp(p,"END_RUN")==0){
+		// nhan duoc thong bao chiu thua tu phia client
+		return End_Game(conn_soc);
+	}
 		
 }
 

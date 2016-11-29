@@ -11,6 +11,18 @@ typedef struct{
 	int online;
 }UserType;
 
+typedef struct{
+	char chess;
+	int x;
+	int y;
+	int status; 
+	/*
+		1: nuoc co binh thuong
+		2: nuoc co chieu tuong
+		0: may het co-> may:thua
+	*/
+}RunType;
+
 enum StatusType{
 	unauthenticated, /* trang thai khi bat dau ket noi voi client*/
 	specified_id,
