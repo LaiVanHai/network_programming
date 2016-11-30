@@ -6,8 +6,8 @@
 #include<string.h>
 
 typedef struct{
-	char[1024] username;
-	char[1024] password;
+	char username[1024];
+	char password[1024];
 	int online;
 }UserType;
 
@@ -23,19 +23,20 @@ typedef struct{
 	*/
 }RunType;
 
-enum StatusType{
+typedef enum {
 	unauthenticated, /* trang thai khi bat dau ket noi voi client*/
 	specified_id,
 	signup,
-	enter_password,
+	signup_pass,
+	confim_pass,
 	authenticated
-}
+}StatusType;
 
-enum PlayStatus{
+typedef enum {
 	not_play, /*trang thai chua bat dau choi*/
 	select_color, /*trang thai chon mau*/
 	check_run, /*trang thai kiem tra nuoc di*/
 	play /*trang thai choi*/
-}
+}PlayStatus;
 
 #endif

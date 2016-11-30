@@ -1,36 +1,33 @@
 #include"ai.h"
+#include"check_user.h"
 
-UserType user;
+UserType user; // luu thong tin cua user
 StatusType status; // trang thai he thong
 PlayStatus play_status; // trang thai cua game
 int data[9][9]; //  du lieu ban co
 char username[1024];
 char password[1024]; 
+int retry=0; // dem so lan nhap sai
 
 void Clear(){
 	strcpy(user.username," ");
 	strcpy(user.password," ");
 	user.online=0;
 }
-int Check_Send(int conn_soc, int bytes_sent){
-	if(bytes_sent>0)
+
+void Check_Send(int conn_soc, int bytes_sent){
+	if(bytes_sent<0)
 	{
-		return 1; 
-	}
-	else{
+		printf("\nError!Can not sent data to client!");
 		close(conn_soc);
-		return 0;
 	}
 }
 
-int Check_Recv(int conn_soc, int bytes_recv){
-	if(bytes_recv>0)
+void Check_Recv(int conn_soc, int bytes_recv){
+	if(bytes_recv<0)
 	{
-		return 1;
-	}
-	else{
+		printf("\nError!Can not receive data from client!");
 		close(conn_soc);
-		return 0;
 	}
 }
 int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua client va server*/
@@ -50,7 +47,7 @@ int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua clien
 		case 1: // lua chon dang nhap
 		{
 			retry = 0;
-			send("LOGIN");
+			send("READY_LOGIN");
 			return 1; 
 		}
 		case 2: // lua chon dang ki
@@ -196,14 +193,14 @@ int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 	char *p;
 	char confirm_password[1024];
 
-	if(status != enter_password){
+	if(status != enter_password|| status != confirm_pass){
 		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
 		return 0; 
 	}
 
 	p = strtok(string,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-	if(strlen(p)<6){
+	if(strlen(p)<6 && status != confirm_pass){
 		if(retry<5){
 			retry++;
 			send("PASS_SHORT");/*mat khau client nhap vao qua ngan*/
@@ -220,11 +217,16 @@ int Signup_Pass(char[1024] string, int conn_soc, int confirm){
 		{
 			send("CONFIRM_PASS"); /*gui yeu cau nhap mat khau xac thuc*/
 			strcmp(password,p);
+			status = confirm_pass; /*dat he thong ve trang thai xac thuc mat khau*/
 			return 1;
 		}
 		else
 		{
-		// day la mat khau confirm
+			if(status != confirm_pass){
+				/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+				return 0; 
+			}
+			// day la mat khau confirm
 			strcmp(confirm_password,p);
 			if(strcmp(password,confirm_password)==0){
 				retry = 0;
@@ -267,6 +269,7 @@ int Check_Logout(char[1024] recv_data, int conn_soc){
 	{
 		Clear();// xoa tai khoan dang dang nhap
 		send("LOGOUT_SUCCESS");
+		status = unauthenticated;
 		/* thong bao nguoi dung thoat dang nhap thanh cong
  		va quay lai trang thai nhu khi nhan thong diep HELLO
 		*/
@@ -277,6 +280,8 @@ int Check_Logout(char[1024] recv_data, int conn_soc){
 int Exit_Connect(int conn_soc){
 	// Thong bao cho nguoi dung biet da san sang cho thoat
 	send("EXIT_OK");
+	play_status = not_play;
+	status = unauthenticated;
 	return 0;// tra ve 0 de ngat ket noi
 }
 
@@ -456,7 +461,6 @@ int Check_Mess(char[1024] recv_data, int conn_soc){
 
 int main()
 {
-	int retry=0;
 	status = unauthenticated;
 	play_status = not_play;
 	if(Co yeu cau ket noi tu client){
