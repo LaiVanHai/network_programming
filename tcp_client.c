@@ -72,6 +72,7 @@ void sgup_pass(){
   gets(s);
   strcpy(buff, "SIGNUP_PASS|");
   strcat(buff, s);
+  strcat(buff,"|");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void confirm_pass(){
@@ -80,8 +81,21 @@ void confirm_pass(){
   gets(s);
   strcpy(buff, "CONFIRM_PASS|");
   strcat(buff, s);
+  strcat(buff,"|");
 }
 ////////////////////////////////////////////////////////////////////////////////
+void authenticated_menu(){
+  char choice[10];
+  printf("-------------------------------------\n");
+  printf("1|- Bat dau tro choi.\n");
+  printf("2|- Thoat dang nhap.\n");
+  printf("3|- Huy ket noi.\n");
+  printf("-------------------------------------\n");
+  printf("Vui long nhap lua chon cua ban:");
+  gets(choice);
+  
+
+}
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
   if(strcmp(buff,"HELLO")==0) /*Khoi tao*/
@@ -156,7 +170,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       sgup_user();
       return 1;
     }
-  if(strcmp(buff, "SIGN_UP_USER_ID_OK") ==0) /*Nhap password*/
+  if(strcmp(buff, "SIGNUP_USER_ID_OK") ==0) /*Nhap password*/
     {
       sgup_pass();
       return 1;
@@ -181,6 +195,11 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
   if(strcmp(buff, "SIGNUP_USER_SUCCESS") ==0) /*Dang ki thanh cong, chuyen qua giao dien menu*/
     {
       menu();
+      return 1;
+    }
+    if(strcmp(buff, "LOGIN_SUCCESS") ==0) /*Dang ki thanh cong, chuyen qua giao dien menu*/
+    {
+      authenticated_menu();
       return 1;
     }
   return 0;

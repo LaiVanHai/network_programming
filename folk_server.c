@@ -134,6 +134,101 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		// kiem tra ten tai khoan dang ky moi
 		return Signup_User(recv_data, conn_soc);
 	}
+	if(strcmp(p,"SIGNUP_PASS")==0){
+		//	tao mat khau cho tai khoan dang ki moi
+		return Signup_Pass(recv_data, conn_soc,0);
+	}
+	if(strcmp(p,"CONFIRM_PASS")==0){
+		// xac nhan lai mat khau dang ki
+		return Signup_Pass(recv_data,conn_soc,1);
+	}
+}
+
+int Signup_Pass(char str[1024], int conn_soc, int confirm){
+	char *p;
+	char confirm_password[1024];
+
+	// if(status != enter_password|| status != confirm_pass){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
+
+	p = strtok(str,"|");
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
+	if(confirm==0)// mat khau moi nhap lan dau
+	{
+		if(strlen(p)<6){
+			if(retry<5){
+				retry++;
+				//send("PASS_SHORT");/*mat khau client nhap vao qua ngan*/
+				//return 1;
+				bytes_sent = send(conn_sock,"PASS_SHORT",22,0);
+				return Check_Send(conn_sock,bytes_sent);
+			}else
+			{
+				Clear();
+				//send("BLOCK"); // nhap sai qua nhieu lan
+				bytes_sent = send(conn_sock,"BLOCK",22,0);
+				return 0; 
+			}
+		}
+		else
+		{
+			retry = 0;
+			//send("CONFIRM_PASS"); /*gui yeu cau nhap mat khau xac thuc*/
+			strcpy(password,p);
+			//status = confirm_pass; /*dat he thong ve trang thai xac thuc mat khau*/
+			//return 1;
+			bytes_sent = send(conn_sock,"CONFIRM_PASS",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}
+	}
+	else
+	{
+		// if(status != confirm_pass){
+		// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+		// 	return 0; 
+		// }
+		// day la mat khau confirm
+		strcpy(confirm_password,p);
+		if(strcmp(password,confirm_password)==0){
+			retry = 0;
+			//send("SIGNUP_USER_SUCCESS");/*thong bao cho ben client biet la da tao thanh cong tai khoan*/
+			/*Client: goi lai menu giong luc moi dang nhap vao*/
+			//status = unauthenticated; /*dua he thong ve trang thai ban dau*/
+			//return 1;
+			Update_Database(username,encode(password));
+			bytes_sent = send(conn_sock,"SIGNUP_USER_SUCCESS",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}	
+		else{
+			if(retry<5){
+				retry++;
+				// send("CONFIRM_NOT_MATCH"); gui yeu cau ben client nhap lai mat khau xac nhan
+				// return 1;
+				bytes_sent = send(conn_sock,"CONFIRM_NOT_MATCH",22,0);
+				return Check_Send(conn_sock,bytes_sent);
+			}else
+			{
+				retry = 0;
+				Clear();
+				//send("BLOCK"); // nhap sai qua nhieu lan
+				bytes_sent = send(conn_sock,"BLOCK",22,0);
+				return 0; 
+			}
+		}
+	}
+}
+	
+
+
+void Update_Database(char user[1024],char pass[1024]){
+	f1=fopen("password.txt","a+");
+	fputs(user,f1);
+	fputs("\t",f1);
+	fputs(pass,f1);
+	fputs("\n",f1);
+	fclose(f1);
 }
 
 int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client va server*/
@@ -141,10 +236,10 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 	// 1: dang nhap
 	// 2: tao tai khoan moi
 	// 3: huy ket noi
-	if(status != unauthenticated){
-		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-		return 0; 
-	}
+	// if(status != unauthenticated){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
 	char *p;
 	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
