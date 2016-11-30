@@ -183,7 +183,7 @@ int Signup_User(char[1024] string, int conn_soc){
 	else
 	{
 		send("SIGNUP_USER_ID_OK");
-		status = enter_password; /*chuuyen qua trang thai nhap password de dang ki*/
+		status = signup_pass; /*chuuyen qua trang thai nhap password de dang ki*/
 		return 1;
 	}
 }

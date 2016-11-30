@@ -63,6 +63,7 @@ void sgup_user(){
   gets(s);
   strcpy(buff, "SIGNUP_USER|");
   strcat(buff, s);
+  strcat(buff,"|");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void sgup_pass(){
@@ -136,11 +137,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       lg_pass();
       return 1;
     }
-  /************************************/
-  if(strcmp(buff,"READY_SIGNUP")==0) /*Chuyen qua giao dien dang ki*/
-    {
-      return 1;
-    }
+
   /************************************/
   if(strcmp(buff, "BLOCK") ==0) /*Huy ket noi*/
     {
@@ -148,12 +145,12 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       return 0;
     }
   ////////////////////////////SIGNUP////////////////////////////////
-  if(strcmp(buff, "SIGNUP") ==0) /*Chuyen qua giao dien signup*/
+  if(strcmp(buff, "READY_SIGNUP") == 0) /*Chuyen qua giao dien signup*/
     {
       sgup_user();
       return 1;
     }
-  if(strcmp(buff, "USER_ID_EXISTED") ==0) /*Tai khoan da ton tai*/
+  if(strcmp(buff, "USER_ID_EXISTED") == 0) /*Tai khoan da ton tai*/
     {
       printf("Tai khoan da ton tai, moi nhap lai\n");
       sgup_user();
@@ -212,7 +209,7 @@ int main(){
     	exit(-1);
       }
       buff[bytes_received] = '\0';
-      //puts(buff);
+      printf("***From Sever: %s\n", buff);
       if(check_buff(buff) == 1){
         bytes_sent = send(client_sock,buff,strlen(buff),0);
         if(bytes_sent == -1){

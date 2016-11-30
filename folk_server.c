@@ -11,8 +11,8 @@
 #define BACKLOG 20
 
 UserType user; // luu thong tin cua user
-StatusType status; // trang thai he thong
-PlayStatus play_status; // trang thai cua game
+StatusType status = unauthenticated; // trang thai he thong
+PlayStatus play_status = not_play; // trang thai cua game
 int data[9][9]; //  du lieu ban co
 char username[1024];
 char password[1024]; 
@@ -119,12 +119,20 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"LOGIN_USER")==0){
 		// tim user trong he thong
-		printf("vao\n");
 		return Check_User(recv_data, conn_soc); 
 	}
 	if(strcmp(p,"LOGIN_PASS")==0){
 		// kiem tra pass co trung khop hay khong
 		return Check_Login_Pass(recv_data,conn_soc);
+	}
+	if(strcmp(p,"SIGNUP")==0){
+		// chuan bi cho viec tao tai khoan moi
+		printf("Dang ki tai khoan\n");
+		return Ready_Signup(conn_soc);
+	}
+	if(strcmp(p,"SIGNUP_USER")==0){
+		// kiem tra ten tai khoan dang ky moi
+		return Signup_User(recv_data, conn_soc);
 	}
 }
 
@@ -184,11 +192,11 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 int Check_User(char str[1024], int conn_soc){ // kiem tra khi client gui ve username
 	char *p;
 
-	if(status != unauthenticated){
-		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-		return 0; 
-	}
-	printf("Check_User|%s\n",str);
+	// if(status != unauthenticated){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
+	printf("Check_User 1|%s\n",str);
 	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
@@ -218,10 +226,10 @@ int Check_Login_Pass(char str[1024], int conn_soc){
 	char *p;
 	char password[1024];
 
-	if(status != specified_id){
-		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-		return 0; 
-	}
+	// if(status != specified_id){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
 
 	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan password ma client gui ve
@@ -255,9 +263,51 @@ int Check_Login_Pass(char str[1024], int conn_soc){
 	}
 }
 
+int Ready_Signup(int conn_soc){
+
+	//if(status == unauthenticated){
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		// Chuan bi cho cong viec dang ki tai khoan moi
+		// Dua bien luu user hien tai ve trang thai rong
+		status = signup; /* cap nhat lai trang thai dang ki */
+		//send("READY_SIGNUP");
+		bytes_sent = send(conn_sock,"READY_SIGNUP",22,0);
+		return Check_Send(conn_sock,bytes_sent); 
+	//}
+	//return 0;
+}
+	
+
+int Signup_User(char str[1024], int conn_soc){
+	char *p;
+
+	//if(status == signup){
+		printf("Username 1:%s\n",str);
+		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+		p = strtok(str,"|");
+		p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
+		strcpy(username,p);
+		printf("Username:%s\n",username);
+		if(Find_User(username)==1)
+		{
+			//send("USER_ID_EXISTED");
+			bytes_sent = send(conn_sock,"USER_ID_EXISTED",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}
+		else
+		{
+			//send("SIGNUP_USER_ID_OK");
+			status = signup_pass; /*chuuyen qua trang thai nhap password de dang ki*/
+			bytes_sent = send(conn_sock,"SIGNUP_USER_ID_OK",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}
+
+	//}
+	//return 0; 
+	
+}
+
 int main(){
-	status = unauthenticated;
-	play_status = not_play;
 
 	if ((listen_sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 ){  /* calls socket() */
 		printf("socket() error\n");
@@ -301,7 +351,7 @@ int main(){
 				}
 				else{
 					recv_data[bytes_received] = '\0';
-					printf("%s\n",recv_data);
+					printf("*** From Cllient: %s\n",recv_data);
 					if(Check_Mess(recv_data, conn_sock) == 0){
 						check_status=0;
 					}
@@ -311,6 +361,9 @@ int main(){
 			exit(0);
 		}
 		
+		status = unauthenticated;
+		play_status = not_play;
+
 		signal(SIGCHLD,sig_chld);
 		
 		close(conn_sock);
