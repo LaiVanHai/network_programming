@@ -43,6 +43,8 @@ void lg_user(){
   gets(s);
   strcpy(buff, "LOGIN_USER|");
   strcat(buff, s);
+  strcat(buff,"|");
+  printf("%s\n",buff);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void lg_pass(){
@@ -51,6 +53,8 @@ void lg_pass(){
   gets(s);
   strcpy(buff, "LOGIN_PASS|");
   strcat(buff, s);
+  strcat(buff,"|");
+
 }
 ////////////////////////////////////////////////////////////////////////////////
 void sgup_user(){
@@ -100,7 +104,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
   if(strcmp(buff, "LOGIN_USER_NOT_EXIST") ==0) /*Nhap tai khoan khong dung*/
     {
       printf("Tai khoan nhap khong dung,moi nhap lai.\n");
-      menu();
+      lg_user();
       return 1;
     }
   if(strcmp(buff, "LOGIN_USER_ID_OK") == 0) /*Giao dien nhap password*/
