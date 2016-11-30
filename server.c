@@ -47,7 +47,7 @@ int Select_Work(char[1024] string, int conn_soc){  /*tuy chon ban dau giua clien
 		case 1: // lua chon dang nhap
 		{
 			retry = 0;
-			send("LOGIN");
+			send("READY_LOGIN");
 			return 1; 
 		}
 		case 2: // lua chon dang ki

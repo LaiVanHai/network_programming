@@ -54,14 +54,16 @@ int Check_Recv(int conn_soc, int bytes_recv){
 
 int Check_Mess(char recv_data[1024], int conn_soc){
 	char *p;
-	p = strtok(recv_data,"|");
-	if(strcmp(p,"SELECT_WORK")){
+	char str[1024];
+	strcpy(str,recv_data);
+	p = strtok(str,"|");
+	if(strcmp(p,"SELECT_WORK")==0){
 		// lua chon cong viec khi moi vao
 		return(Select_Work(recv_data, conn_soc));
 	}
 }
 
-int Select_Work(char string[1024], int conn_soc){  /*tuy chon ban dau giua client va server*/
+int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client va server*/
 	// co 2 tuy chon
 	// 1: dang nhap
 	// 2: tao tai khoan moi
@@ -71,7 +73,7 @@ int Select_Work(char string[1024], int conn_soc){  /*tuy chon ban dau giua clien
 		return 0; 
 	}
 	char *p;
-	p = strtok(string,"|");
+	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	int check = atoi(p); // lua chon cua client gui ve
 	switch(check){
@@ -79,7 +81,8 @@ int Select_Work(char string[1024], int conn_soc){  /*tuy chon ban dau giua clien
 		{
 			retry = 0;
 			//send("LOGIN");
-			bytes_sent = send(conn_sock,"LOGIN",22,0);
+			printf("READY_LOGIN\n");
+			bytes_sent = send(conn_sock,"READY_LOGIN",22,0);
 			return Check_Send(conn_sock,bytes_sent);
 		}
 		case 2: // lua chon dang ki
@@ -114,6 +117,8 @@ int Select_Work(char string[1024], int conn_soc){  /*tuy chon ban dau giua clien
 }
 
 int main(){
+	status = unauthenticated;
+	play_status = not_play;
 
 	if ((listen_sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 ){  /* calls socket() */
 		printf("socket() error\n");
@@ -149,6 +154,7 @@ int main(){
 				continue;
 			}
 			int check_status =1; /*bien kiem soat qua trinh lam viec voi client*/
+
 			do{
 				bytes_received = recv(conn_sock,recv_data,1024,0); //blocking
 				if (Check_Recv(conn_sock,bytes_received) < 0){
@@ -156,6 +162,7 @@ int main(){
 				}
 				else{
 					recv_data[bytes_received] = '\0';
+					//printf("%s\n",recv_data);
 					if(Check_Mess(recv_data, conn_sock) == 0){
 						check_status=0;
 					}

@@ -19,8 +19,13 @@ void menu(){
   printf("3.Huy ket noi\n");
   printf("Hay lua chon tuy chon: ");
   gets(choice);
+  //printf("ban da chon %s\n",choice);
   strcpy(buff,"SELECT_WORK|");
   strcat(buff,choice);
+  strcat(buff,"|");
+  /*khuon dang gui SELECT|1|*/
+  //buff[strlen(buff)]='\0';
+  //printf("%s\n",buff);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void menu2(){
@@ -87,7 +92,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   /***********************************/
   ////////////////////////////LOGIN///////////////////////////////
-  if(strcmp(buff,"LOGIN")==0) /*Chuyen qua giao dien dang nhap,nhap Username*/
+  if(strcmp(buff,"READY_LOGIN")==0) /*Chuyen qua giao dien dang nhap,nhap Username*/
     {
       lg_user();
       return 1;
@@ -110,11 +115,6 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       return 1;
     }
   /***********************************/
-  if(strcmp(buff,"LOGIN")==0) /*Chuyen qua giao dien dang nhap*/
-    {
-      lg_user();
-      return 1;
-    }
   if(strcmp(buff, "LOGIN_USER_NOT_EXIST") ==0) /*Nhap tai khoan khong dung*/
     {
       printf("Tai khoan nhap khong dung,moi nhap lai.\n");
@@ -207,7 +207,8 @@ int main(){
     	close(client_sock);
     	exit(-1);
       }
-      // puts(buff);
+      buff[bytes_received] = '\0';
+      //puts(buff);
       if(check_buff(buff) == 1){
         bytes_sent = send(client_sock,buff,strlen(buff),0);
         if(bytes_sent == -1){
