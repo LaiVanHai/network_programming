@@ -64,7 +64,8 @@ void menu2(){
   do
   {
     printf("Nhap vao lua chon cua ban:");
-    scanf("%d%*c", &choice);
+    scanf("%d", &choice);
+    while(getchar()!='\n');
     switch(choice){
       case 1: {
         lg_user();
@@ -87,8 +88,6 @@ void menu2(){
       }
     }
   }while(dd==0);
-  if(choice == 1) strcmp(buff, "SIGN_UP");
-  else strcmp(buff, "EXIT");
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -128,11 +127,12 @@ void confirm_pass(){
 ////////////////////////////////////////////////////////////////////////////////
 void authenticated_menu(){
   char choice[10];
-  printf("-------------------------------------\n");
+  int dd=0;
+  printf("=====================================\n");
   printf("1|- Bat dau tro choi.\n");
   printf("2|- Thoat dang nhap.\n");
   printf("3|- Huy ket noi.\n");
-  printf("-------------------------------------\n");
+  printf("=====================================\n");
   printf("Vui long nhap lua chon cua ban:");
   gets(choice);
 
