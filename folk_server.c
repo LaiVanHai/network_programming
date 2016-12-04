@@ -263,7 +263,7 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 		case 3:
 		{
 			retry = 0;
-			bytes_sent = send(conn_sock,"BLOCK",22,0);
+			bytes_sent = send(conn_sock,"EXIT_OK",22,0);
 			return 0; // lua chon huy ket noi
 		}
 		default:

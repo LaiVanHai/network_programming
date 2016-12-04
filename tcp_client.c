@@ -14,11 +14,15 @@ int bytes_sent,bytes_received;
 ////////////////////////////////////////////////////////////////////////////////
 void menu(){
   char choice[10];
-  printf("1.Dang nhap\n");
-  printf("2.Tao tai khoan moi\n");
-  printf("3.Huy ket noi\n");
+  printf("=====================================\n");
+  printf("1. Dang nhap\n");
+  printf("2. Tao tai khoan moi\n");
+  printf("3. Huy ket noi\n");
+  printf("=====================================\n");
+
   printf("Hay lua chon tuy chon: ");
   gets(choice);
+  printf("-------------------------------------\n");
   //printf("ban da chon %s\n",choice);
   strcpy(buff,"SELECT_WORK|");
   strcat(buff,choice);
@@ -28,48 +32,84 @@ void menu(){
   //printf("%s\n",buff);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void menu2(){
-  int choice;
-  printf("1.Tao tai khoan moi\n");
-  printf("2.Exit\n");
-  scanf("%d%*c", &choice);
-  if(choice == 1) strcmp(buff, "SIGN_UP");
-  else strcmp(buff, "EXIT");
-}
-////////////////////////////////////////////////////////////////////////////////
 void lg_user(){
   char s[80];
-  printf("Nhap username: ");
+  printf("Nhap ten dang nhap: ");
   gets(s);
+  printf("-------------------------------------\n");
   strcpy(buff, "LOGIN_USER|");
   strcat(buff, s);
   strcat(buff,"|");
   printf("%s\n",buff);
 }
 ////////////////////////////////////////////////////////////////////////////////
+void sgup_user(){
+  char s[80];
+  printf("Nhap ten dang ky: ");
+  gets(s);
+  printf("-------------------------------------\n");
+  strcpy(buff, "SIGNUP_USER|");
+  strcat(buff, s);
+  strcat(buff,"|");
+}
+////////////////////////////////////////////////////////////////////////////////
+void menu2(){
+  int choice;
+  int dd=0;
+  printf("=====================================\n");
+  printf("1. Dang nhap lai.\n");
+  printf("2. Tao tai khoan moi\n");
+  printf("3. Thoat\n");
+  printf("=====================================\n");
+  do
+  {
+    printf("Nhap vao lua chon cua ban:");
+    scanf("%d%*c", &choice);
+    switch(choice){
+      case 1: {
+        lg_user();
+        dd=1;
+        break;
+      }
+      case 2: {
+        sgup_user();
+        dd=1;
+        break;
+      }
+      case 3: {
+        strcpy(buff,"EXIT|");
+        dd=1;
+        break;
+      }
+      default: {
+        printf("Ban vui long nhap lai yeu cau.\n");
+        break;
+      }
+    }
+  }while(dd==0);
+  if(choice == 1) strcmp(buff, "SIGN_UP");
+  else strcmp(buff, "EXIT");
+}
+////////////////////////////////////////////////////////////////////////////////
+
 void lg_pass(){
   char s[80];
-  printf("Nhap password: ");
+  printf("Nhap mat khau: ");
   gets(s);
+  printf("-------------------------------------\n");
   strcpy(buff, "LOGIN_PASS|");
   strcat(buff, s);
   strcat(buff,"|");
 
 }
 ////////////////////////////////////////////////////////////////////////////////
-void sgup_user(){
-  char s[80];
-  printf("Nhap user: ");
-  gets(s);
-  strcpy(buff, "SIGNUP_USER|");
-  strcat(buff, s);
-  strcat(buff,"|");
-}
-////////////////////////////////////////////////////////////////////////////////
+
 void sgup_pass(){
   char s[80];
-  printf("Nhap password: ");
+  printf("Nhap mat khau: ");
   gets(s);
+  printf("-------------------------------------\n");
+
   strcpy(buff, "SIGNUP_PASS|");
   strcat(buff, s);
   strcat(buff,"|");
@@ -79,6 +119,8 @@ void confirm_pass(){
   char s[80];
   printf("Xac nhan mat khau: ");
   gets(s);
+  printf("-------------------------------------\n");
+
   strcpy(buff, "CONFIRM_PASS|");
   strcat(buff, s);
   strcat(buff,"|");
@@ -93,8 +135,11 @@ void authenticated_menu(){
   printf("-------------------------------------\n");
   printf("Vui long nhap lua chon cua ban:");
   gets(choice);
-  
 
+}
+
+void exit_programm(){
+  printf("Ban da huy ket noi thanh cong.\n");
 }
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
@@ -118,8 +163,8 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "LOGIN_USER_NOT_EXIST") ==0) /*Nhap tai khoan khong dung*/
     {
-      printf("Tai khoan nhap khong dung,moi nhap lai.\n");
-      lg_user();
+      printf("Tai khoan nhap khong dung.\n");
+      menu2();
       return 1;
     }
   if(strcmp(buff, "LOGIN_USER_ID_OK") == 0) /*Giao dien nhap password*/
@@ -129,25 +174,14 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "PASS_NOT_MATCH") ==0)
     {
-      printf("Password khong dung,moi nhap lai.\n");
+      printf("Mat khau khong dung,moi nhap lai.\n");
       lg_pass();
       return 1;
     }
   /***********************************/
-  if(strcmp(buff, "LOGIN_USER_NOT_EXIST") ==0) /*Nhap tai khoan khong dung*/
-    {
-      printf("Tai khoan nhap khong dung,moi nhap lai.\n");
-      menu();
-      return 1;
-    }
-  if(strcmp(buff, "LOGIN_USER_ID_OK") == 0) /*Giao dien nhap password*/
-    {
-      lg_pass();
-      return 1;
-    }
   if(strcmp(buff, "PASS_NOT_MATCH") ==0)
     {
-      printf("Password khong dung,moi nhap lai.\n");
+      printf("Mat khau khong dung,moi nhap lai.\n");
       lg_pass();
       return 1;
     }
@@ -177,7 +211,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "PASS_SHORT") ==0) /*Password qua ngan*/
     {
-      printf("Password qua ngan, moi nhap lai.\n");
+      printf("Mat khau qua ngan, moi nhap lai.\n");
       sgup_pass();
       return 1;
     }
@@ -201,6 +235,11 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     {
       authenticated_menu();
       return 1;
+    }
+    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
+    {
+      exit_programm();
+      return 0;
     }
   return 0;
 }
