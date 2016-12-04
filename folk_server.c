@@ -25,6 +25,8 @@ struct sockaddr_in client; /* client's address information */
 pid_t pid;
 int sin_size;
 FILE *f1;
+int color; // luu mau quan co
+int chess[9][9]; // ban co 
 
 void sig_chld(int signo){
 	pid_t pid;
@@ -142,6 +144,108 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		// xac nhan lai mat khau dang ki
 		return Signup_Pass(recv_data,conn_soc,1);
 	}
+	if(strcmp(p,"LOGOUT")==0){
+		// nguoi dung muon thoat dang nhap
+		// suy tinh xem co nen bat nguoi dung truyen user muon thoat khong nhi
+		return Check_Logout(recv_data,conn_soc);
+	}
+	if(strcmp(p,"START_GAME")==0){
+		// nhan yeu cau bat dau tro choi cua nguoi dung
+		return Start_Game(conn_soc);
+	}
+	if(strcmp(p,"COLOR")==0){
+		// nguoi choi da chon mau quan co, bat dau tro choi
+		return Check_Color(recv_data,conn_soc);
+	}
+}
+
+
+int Check_Color(char str[1024], int conn_soc){
+	char *p;
+	int number;
+
+	// if(status != authenticated || play_status != select_color){
+	// 	phai dang nhap moi choi game duoc
+	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+	// 	return 0; 
+	// }
+
+	p = strtok(str,"|");
+	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
+	number = atoi(p);
+	// if(number == 2){ // 1: trang, 2: den
+	// 	//send("COLOR_OK");
+	// 	bytes_sent = send(conn_sock,"COLOR_OK",22,0);
+	// 	return Check_Send(conn_sock,bytes_sent);
+		//play_status = play; /*dat game vao trang thai choi*/
+		/*mau trang di truoc*/
+		if(number == 2){
+			// may se la nguoi danh truoc
+			color = 1;
+			//send("RUN|6|3|4|3");/*gui ve phia client nuoc co cua server*/
+			//return 1;
+			bytes_sent = send(conn_sock,"RUN|6|3|4|3",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}
+		if(number == 1){
+			// nguoi dung chon quan mau trang
+			color = 2;
+			//send("COLOR_OK");
+			bytes_sent = send(conn_sock,"COLOR_OK",22,0);
+			return Check_Send(conn_sock,bytes_sent);
+		}
+		//return 1;
+	// }
+	// else
+	// {
+	// 	//send("COLOR_ERROR");
+	// 	bytes_sent = send(conn_sock,"COLOR_ERROR",22,0);
+	// 	return Check_Send(conn_sock,bytes_sent);
+	// 	//return 1;
+	// }
+	
+}
+
+int Check_Logout(char recv_data[1024], int conn_soc){
+	// if(status != authenticated){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
+	// if(user.online==0){
+	// 	// nguoi dung chua dang nhap
+	// 	send("LOGOUT_NOT_SUCCESS"); 
+	// 	 thong bao nguoi dung chua dang nhap
+	// 	va quay lai trang thai nhu khi nhan thong diep HELLO
+		
+	// 	return 1;
+	// }
+	// else
+	{
+		Clear();// xoa tai khoan dang dang nhap
+		//send("LOGOUT_SUCCESS");
+		bytes_sent = send(conn_sock,"LOGOUT_SUCCESS",22,0);
+		return Check_Send(conn_sock,bytes_sent);
+		//status = unauthenticated;
+		/* thong bao nguoi dung thoat dang nhap thanh cong
+ 		va quay lai trang thai nhu khi nhan thong diep HELLO
+		*/
+		//return 0;
+	}
+}
+
+
+int Start_Game(int conn_soc){
+	// if(status != authenticated || play_status != not_play){
+	// 	phai dang nhap moi choi game duoc
+	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
+	// 	return 0; 
+	// }
+	bytes_sent = send(conn_sock,"GAME_READY",22,0);
+	return Check_Send(conn_sock,bytes_sent);
+	//send("GAME_READY"); 
+	//play_status = select_color; /*dua game vao trang thai chon mau*/
+	/* nhan duoc thong diep nay client cho nguoi dung chon mau quan co*/
+	//return 1;
 }
 
 int Signup_Pass(char str[1024], int conn_soc, int confirm){

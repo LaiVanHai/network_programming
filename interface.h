@@ -1,8 +1,6 @@
-#include<stdlib.h>
-#include<string.h>
+#ifndef __INTERFACE__
+#define __INTERFACE__
 #include<stdio.h>
-int chess[9][9];
-int check_char();
 void make_chess(int chess[9][9])
 {
   int i,j;
@@ -13,7 +11,6 @@ void make_chess(int chess[9][9])
 	   for(j=0;j<=7;j++)
 	{
 	  chess[i][j]='o';
-	  printf("%d\n",chess[i][j]);
 	}
 	}
       else
@@ -37,7 +34,7 @@ void make_chess(int chess[9][9])
   chess[7][3]='H';chess[7][4]='W';
   
 }
-void paint(int chess[8][8]){
+void paint(int chess[9][9]){
   int i,j;
   printf("--------------------------------------------------------------------\n");
   printf("       0\t1\t 2\t 3\t 4\t 5\t 6\t 7\t\n");
@@ -58,17 +55,5 @@ void paint(int chess[8][8]){
   printf("____________________________________________________________________\t");
   printf("--->Trang<---\n");
 }
-int main(){
-  make_chess();
-  paint(chess);
-  int id,x,y,x1,y1;
-  printf("Nhap vao quan co ban chon:");
-  scanf("%d %d",&x1,&y1);
-  printf("Nhap vao toa do:");
-  scanf("%d",&x);
-  scanf("%d",&y);
-  chess[x][y]=chess[x1][y1];
-  chess[x1][y1]='_';
-  paint(chess);
-  
-}
+
+#endif

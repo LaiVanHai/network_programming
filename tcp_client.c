@@ -1,3 +1,4 @@
+#include"interface.h"
 #include <stdio.h>
 #include <errno.h>
 #include <netdb.h>
@@ -11,6 +12,8 @@ int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
+int chess[9][9];
+int color;
 ////////////////////////////////////////////////////////////////////////////////
 void menu(){
   char choice[10];
@@ -126,21 +129,97 @@ void confirm_pass(){
 }
 ////////////////////////////////////////////////////////////////////////////////
 void authenticated_menu(){
-  char choice[10];
+  int choice;
   int dd=0;
   printf("=====================================\n");
   printf("1|- Bat dau tro choi.\n");
   printf("2|- Thoat dang nhap.\n");
   printf("3|- Huy ket noi.\n");
   printf("=====================================\n");
-  printf("Vui long nhap lua chon cua ban:");
-  gets(choice);
+  do
+  {
+    printf("Nhap vao lua chon cua ban:");
+    scanf("%d", &choice);
+    //while(getchar()!='\n');
+    switch(choice){
+      case 1: {
+        strcpy(buff,"START_GAME|");
+        dd=1;
+        break;
+      }
+      case 2: {
+        strcpy(buff,"LOGOUT|");
+        dd=1;
+        break;
+      }
+      case 3: {
+        strcpy(buff,"EXIT|");
+        dd=1;
+        break;
+      }
+      default: {
+        printf("Ban vui long nhap lai yeu cau.\n");
+        break;
+      }
+    }
+  }while(dd==0);
 
 }
 
 void exit_programm(){
   printf("Ban da huy ket noi thanh cong.\n");
 }
+
+void game_ready(){
+  int dd=0;
+  int choice=0;
+  make_chess(chess);
+  paint(chess);
+  printf("=====================================\n");
+  printf("1. Trang.\n");
+  printf("2. Den.\n");
+  printf("=====================================\n");
+  do{
+    printf("Vui long nhap vao lua chon cua ban:");
+    scanf("%d",&choice);
+    while(getchar()!='\n');
+    switch(choice){
+      case 1:
+      {
+        strcpy(buff,"COLOR|1|");
+        color = 1;
+        dd = 1;
+        break;
+      }
+      case 2:
+      {
+        strcpy(buff,"COLOR|2|");
+        color = 2;
+        dd = 1;
+        break;
+      }
+      case 3:
+      {
+        printf("**Loi**\nBan vui long nhap lai.\n");
+        break;
+      }
+    }
+  }while(dd==0);
+}
+
+void select_run(){
+  int id,x,y,x1,y1;
+  printf("Nhap vao quan co ban chon:");
+  scanf("%d %d",&x1,&y1);
+  printf("Nhap vao toa do:");
+  scanf("%d",&x);
+  scanf("%d",&y);
+}
+
+void server_run(){
+
+}
+
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
   if(strcmp(buff,"HELLO")==0) /*Khoi tao*/
@@ -236,10 +315,37 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       authenticated_menu();
       return 1;
     }
+    if(strcmp(buff, "LOGOUT_SUCCESS") ==0) /*Dang ki thanh cong, chuyen qua giao dien menu*/
+    {
+      printf("Ban da thoat dang nhap thanh cong.\n");
+      menu();
+      return 1;
+    }
+    if(strcmp(buff, "GAME_READY") ==0) /*Chon mau quan co de chuan bi choi*/
+    {
+      game_ready();
+      return 1;
+    }
+    if(strcmp(buff, "COLOR_OK") ==0) /*Nhap vao nuoc co cua phia client*/
+    {
+      select_run();
+      return 1;
+    }
     if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
     {
       exit_programm();
       return 0;
+    }
+    if(buff[strlen(buff)-1]=='|'){
+      char str[1024];
+      char *p;
+      strcpy(str, buff);
+      p = strtok(str,"|");
+      if(strcmp(p,"RUN")==0){
+        server_run(); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+
     }
   return 0;
 }
