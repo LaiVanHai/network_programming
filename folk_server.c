@@ -1,4 +1,5 @@
 #include"my_type.h"
+#include"ai.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -53,7 +54,7 @@ int Check_Recv(int conn_soc, int bytes_recv){
 		close(conn_soc);
 		return -1;
 	}
-	return 1;
+	return 1;	
 }
 
 char* encode(char* str) {
@@ -148,7 +149,7 @@ int Check_Run(char string[1024], int conn_soc){
     p = strtok(NULL,"|");
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
 
-    if(check_run(chess, color, x1, y1, x , y)>0){ 
+    if(check_chess_run(chess, color, x1, y1, x , y)>0){ 
     	// check_run _ ai.h
     	//duong di cua phia client la hop le
     	/*
@@ -167,19 +168,20 @@ int Check_Run(char string[1024], int conn_soc){
     	else
     	{
 	    	x = run.x;
-	    	itoa(x,str,10); /*chuyen so thanh xau*/
+	    	sprintf(str, "%d", x);
+	    	/*chuyen so thanh xau*/
 	    	strcpy(buff,str);
 	    	strcat(buff,"|");
 	    	y = run.y;
-	    	itoa(y,str,10);/*chuyen so thanh xau*/
+	    	sprintf(str, "%d", y);/*chuyen so thanh xau*/
 	    	strcat(buff,str);
 	    	strcat(buff,"|");
 	    	x1 = run.x1;
-	    	itoa(x1,str,10);/*chuyen so thanh xau*/
+	    	sprintf(str, "%d", x1);/*chuyen so thanh xau*/
 	    	strcat(buff,str);
 	    	strcat(buff,"|");
 	    	y1 = run.y1;
-	    	itoa(y1,str,10);/*chuyen so thanh xau*/
+	    	sprintf(str, "%d", y1);/*chuyen so thanh xau*/
 	    	strcat(buff,str);
 	    	strcat(buff,"|");
 	    	if(run.status == 1)
@@ -410,9 +412,13 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 	// 	return 0; 
 	// }
 	char *p;
+	int check;
 	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-	int check = atoi(p); // lua chon cua client gui ve
+	if(p==NULL){
+		check = 4; /* truong hop client khong nhap gi*/
+	}
+	else check = atoi(p); // lua chon cua client gui ve
 	switch(check){
 		case 1: // lua chon dang nhap
 		{

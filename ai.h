@@ -1,5 +1,5 @@
-#ifndef __MY_TYPE__
-#define __MY_TYPE__
+#ifndef __AI__
+#define __AI__
 
 #include"my_type.h"
 #include<stdio.h>
@@ -12,7 +12,7 @@ int Random(int n)
 }
 
 
-int check_run(int a[9][9], int color, int x1, int y1, int x, int y)
+int check_chess_run(int a[9][9], int color, int x1, int y1, int x, int y)
 {
 	/*kiem tra tinh hop le cua nuoc co*/
 	return 1;

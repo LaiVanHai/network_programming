@@ -36,6 +36,7 @@ void make_chess(int chess[9][9])
 }
 void paint(int chess[9][9], int x){
   /* x=2 nguoi choi chon den, 1 nguoi choi chon trang */
+  /* x=3 nguoi dung chua chon mau*/
   int i,j;
   printf("--------------------------------------------------------------------\n");
   printf("       0\t1\t 2\t 3\t 4\t 5\t 6\t 7\t\n");
@@ -44,12 +45,10 @@ void paint(int chess[9][9], int x){
   {
     printf("--->Den(H)<---\n");
   }
-  else
+  else if(x==1||x==3)
   {
     printf("--->Den<---\n");
   }
-  
-
   for(i=0;i<=7;i++){
     printf("   ||\n");
     printf("   ||\n");
@@ -62,10 +61,12 @@ void paint(int chess[9][9], int x){
     printf("\n");
   }
   printf("____________________________________________________________________\t");
-  if(x==1)
+  if(x==2||x==3)
   {
     printf("--->Trang<---\n");    
-  }else{
+  }
+  else if(x==1)
+  {
     printf("--->Trang(H)<---\n");    
   }
 }

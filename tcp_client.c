@@ -1,4 +1,5 @@
 #include"interface.h"
+#include"my_type.h"
 #include <stdio.h>
 #include <errno.h>
 #include <netdb.h>
@@ -14,6 +15,20 @@ struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
 int chess[9][9];
 int color;
+RunType run_demo; /*bien luu su di chuyen cua quan co*/
+////////////////////////////////////////////////////////////////////////////////
+
+// void convert(int x, int y, int x1, int y1){
+//   /*ham di chuyen vi tri quan co trong ban co */
+//   /*di tu (x,y) den (x1, y1)*/
+//   if(chess[x1][y1]=='_'){
+//     /*vi tri di chuyen toi la vi tri trong*/
+//     chess[x1][y1]=chess[x][y];
+//     chess[x][y]='_';
+//   }
+
+// }
+
 ////////////////////////////////////////////////////////////////////////////////
 void menu(){
   char choice[10];
@@ -140,7 +155,7 @@ void authenticated_menu(){
   {
     printf("Nhap vao lua chon cua ban:");
     scanf("%d", &choice);
-    //while(getchar()!='\n');
+    while(getchar()!='\n');
     switch(choice){
       case 1: {
         strcpy(buff,"START_GAME|");
@@ -174,7 +189,7 @@ void game_ready(){
   int dd=0;
   int choice=0;
   make_chess(chess);
-  paint(chess,color);
+  paint(chess,3);
   printf("=====================================\n");
   printf("1. Trang.\n");
   printf("2. Den.\n");
@@ -209,26 +224,34 @@ void game_ready(){
 
 void select_run(){
   char x1[2],y1[2],x[2],y[2];
+  /*x, y la toa do chon
+  x1, y1 la toa do di den*/
   printf("Nhap vao quan co ban chon:\n");
-  printf("Toa do hang:");
-  gets(x1);
-  printf("Toa do cot:");
-  gets(y1);
-  //scanf("%d %d",&x1,&y1);
-  printf("Nhap vao vi tri ban muon toi:\n");
   printf("Toa do hang:");
   gets(x);
   printf("Toa do cot:");
   gets(y);
+  //scanf("%d %d",&x1,&y1);
+  printf("Nhap vao vi tri ban muon toi:\n");
+  printf("Toa do hang:");
+  gets(x1);
+  printf("Toa do cot:");
+  gets(y1);
+  /*luu lai duong di truoc khi gui qua server kiem tra*/
+  run_demo.x=atoi(x);
+  run_demo.y=atoi(y);
+  run_demo.x1=atoi(x1);
+  run_demo.y1=atoi(y1);
   strcpy(buff,"RUN|");
-  strcat(buff,x1);
-  strcat(buff,"|");
-  strcat(buff,y1);
-  strcat(buff,"|");
   strcat(buff,x);
   strcat(buff,"|");
   strcat(buff,y);
   strcat(buff,"|");
+  strcat(buff,x1);
+  strcat(buff,"|");
+  strcat(buff,y1);
+  strcat(buff,"|");
+
 }
 
 void select_warning(){
@@ -272,6 +295,13 @@ void server_run(int warning){
   */
   char *p;
   int x,y,x1,y1;
+  /*Cap nhat nuoc co ma client danh truoc do*/
+  x = run_demo.x;
+  y = run_demo.y;
+  x1 = run_demo.x1;
+  y1 = run_demo.y1;
+  chess[x1][y1]=chess[x][y];
+  chess[x][y]='_';
   p = strtok(buff,"|");
   p = strtok(NULL,"|");
   x=atoi(p);
@@ -281,8 +311,10 @@ void server_run(int warning){
   x1=atoi(p);
   p = strtok(NULL,"|");
   y1=atoi(p);
+  /*cap nhat nuoc co ma server danh tra*/
   chess[x1][y1]=chess[x][y];
   chess[x][y]='_';
+  printf("Color bang %d\n", color);
   paint(chess,color);
   if(warning == 0)
   {
@@ -423,7 +455,6 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     if(buff[strlen(buff)-1]=='|'){
       char str[1024];
       char *p;
-      printf("Check run.\n");
       strcpy(str, buff);
       p = strtok(str,"|");
       if(strcmp(p,"RUN")==0){ /*day la nuoc co binh thuong ma server gui den*/
