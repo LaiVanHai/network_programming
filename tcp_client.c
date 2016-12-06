@@ -1,14 +1,6 @@
 #include"interface.h"
 #include"my_type.h"
-#include <stdio.h>
-#include <errno.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <stdlib.h>
+#include"client.h"
 int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
@@ -16,331 +8,6 @@ int bytes_sent,bytes_received;
 int chess[9][9];
 int color=0;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
-////////////////////////////////////////////////////////////////////////////////
-
-// void convert(int x, int y, int x1, int y1){
-//   /*ham di chuyen vi tri quan co trong ban co */
-//   /*di tu (x,y) den (x1, y1)*/
-//   if(chess[x1][y1]=='_'){
-//     /*vi tri di chuyen toi la vi tri trong*/
-//     chess[x1][y1]=chess[x][y];
-//     chess[x][y]='_';
-//   }
-
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-void menu(){
-  char choice[10];
-  printf("=====================================\n");
-  printf("1. Dang nhap\n");
-  printf("2. Tao tai khoan moi\n");
-  printf("3. Huy ket noi\n");
-  printf("=====================================\n");
-
-  printf("Hay lua chon tuy chon: ");
-  gets(choice);
-  printf("-------------------------------------\n");
-  //printf("ban da chon %s\n",choice);
-  strcpy(buff,"SELECT_WORK|");
-  strcat(buff,choice);
-  strcat(buff,"|");
-  /*khuon dang gui SELECT|1|*/
-  //buff[strlen(buff)]='\0';
-  //printf("%s\n",buff);
-}
-////////////////////////////////////////////////////////////////////////////////
-void lg_user(){
-  char s[80];
-  printf("Nhap ten dang nhap: ");
-  gets(s);
-  printf("-------------------------------------\n");
-  strcpy(buff, "LOGIN_USER|");
-  strcat(buff, s);
-  strcat(buff,"|");
-  printf("%s\n",buff);
-}
-////////////////////////////////////////////////////////////////////////////////
-void sgup_user(){
-  char s[80];
-  printf("Nhap ten dang ky: ");
-  gets(s);
-  printf("-------------------------------------\n");
-  strcpy(buff, "SIGNUP_USER|");
-  strcat(buff, s);
-  strcat(buff,"|");
-}
-////////////////////////////////////////////////////////////////////////////////
-void menu2(){
-  int choice;
-  int dd=0;
-  printf("=====================================\n");
-  printf("1. Dang nhap lai.\n");
-  printf("2. Tao tai khoan moi\n");
-  printf("3. Thoat\n");
-  printf("=====================================\n");
-  do
-  {
-    printf("Nhap vao lua chon cua ban:");
-    scanf("%d", &choice);
-    while(getchar()!='\n');
-    switch(choice){
-      case 1: {
-        lg_user();
-        dd=1;
-        break;
-      }
-      case 2: {
-        sgup_user();
-        dd=1;
-        break;
-      }
-      case 3: {
-        strcpy(buff,"EXIT|");
-        dd=1;
-        break;
-      }
-      default: {
-        printf("Ban vui long nhap lai yeu cau.\n");
-        break;
-      }
-    }
-  }while(dd==0);
-}
-////////////////////////////////////////////////////////////////////////////////
-
-void lg_pass(){
-  char s[80];
-  printf("Nhap mat khau: ");
-  gets(s);
-  printf("-------------------------------------\n");
-  strcpy(buff, "LOGIN_PASS|");
-  strcat(buff, s);
-  strcat(buff,"|");
-
-}
-////////////////////////////////////////////////////////////////////////////////
-
-void sgup_pass(){
-  char s[80];
-  printf("Nhap mat khau: ");
-  gets(s);
-  printf("-------------------------------------\n");
-
-  strcpy(buff, "SIGNUP_PASS|");
-  strcat(buff, s);
-  strcat(buff,"|");
-}
-////////////////////////////////////////////////////////////////////////////////
-void confirm_pass(){
-  char s[80];
-  printf("Xac nhan mat khau: ");
-  gets(s);
-  printf("-------------------------------------\n");
-
-  strcpy(buff, "CONFIRM_PASS|");
-  strcat(buff, s);
-  strcat(buff,"|");
-}
-////////////////////////////////////////////////////////////////////////////////
-void authenticated_menu(){
-  int choice;
-  int dd=0;
-  printf("=====================================\n");
-  printf("1|- Bat dau tro choi.\n");
-  printf("2|- Thoat dang nhap.\n");
-  printf("3|- Huy ket noi.\n");
-  printf("=====================================\n");
-  do
-  {
-    printf("Nhap vao lua chon cua ban:");
-    scanf("%d", &choice);
-    while(getchar()!='\n');
-    switch(choice){
-      case 1: {
-        strcpy(buff,"START_GAME|");
-        dd=1;
-        break;
-      }
-      case 2: {
-        strcpy(buff,"LOGOUT|");
-        dd=1;
-        break;
-      }
-      case 3: {
-        strcpy(buff,"EXIT|");
-        dd=1;
-        break;
-      }
-      default: {
-        printf("Ban vui long nhap lai yeu cau.\n");
-        break;
-      }
-    }
-  }while(dd==0);
-
-}
-
-void exit_program(){
-  printf("Ban da huy ket noi thanh cong.\n");
-}
-
-void game_ready(){
-  int dd=0;
-  int choice=0;
-  make_chess(chess);
-  paint(chess,3);
-  printf("=====================================\n");
-  printf("1. Trang.\n");
-  printf("2. Den.\n");
-  printf("=====================================\n");
-  do{
-    printf("Vui long nhap vao lua chon cua ban:");
-    scanf("%d",&choice);
-    while(getchar()!='\n');
-    switch(choice){
-      case 1:
-      {
-        strcpy(buff,"COLOR|1|");
-        color = 1;
-        dd = 1;
-        break;
-      }
-      case 2:
-      {
-        strcpy(buff,"COLOR|2|");
-        color = 2;
-        dd = 1;
-        break;
-      }
-      case 3:
-      {
-        printf("**Loi**\nBan vui long nhap lai.\n");
-        break;
-      }
-    }
-  }while(dd==0);
-}
-
-void select_run(){
-  char x1[2],y1[2],x[2],y[2];
-  /*x, y la toa do chon
-  x1, y1 la toa do di den*/
-  printf("Nhap vao quan co ban chon:\n");
-  printf("Toa do hang:");
-  gets(x);
-  printf("Toa do cot:");
-  gets(y);
-  //scanf("%d %d",&x1,&y1);
-  printf("Nhap vao vi tri ban muon toi:\n");
-  printf("Toa do hang:");
-  gets(x1);
-  printf("Toa do cot:");
-  gets(y1);
-  /*luu lai duong di truoc khi gui qua server kiem tra*/
-  run_demo.x=atoi(x);
-  run_demo.y=atoi(y);
-  run_demo.x1=atoi(x1);
-  run_demo.y1=atoi(y1);
-  strcpy(buff,"RUN|");
-  strcat(buff,x);
-  strcat(buff,"|");
-  strcat(buff,y);
-  strcat(buff,"|");
-  strcat(buff,x1);
-  strcat(buff,"|");
-  strcat(buff,y1);
-  strcat(buff,"|");
-
-}
-
-void select_warning(){
-  int choice;
-  int dd=0;
-  printf("Day la nuoc co chieu tuong, ban co chiu thua khong?.\n");
-  printf("=====================================\n");
-  printf("1. Co.\n");
-  printf("2. Khong.\n");
-  printf("=====================================\n");
-  do{
-    printf("Vui long nhap vao lua chon cua ban:");
-    scanf("%d",&choice);
-    switch(choice){
-      case 1:
-      {
-        strcpy(buff,"END_RUN");
-        dd=1;
-        break;
-      }
-      case 2:
-      {
-        select_run();
-        dd=1;
-        break;
-      }
-      default:
-      {
-        printf("**Loi**Ban da nhap vao tuy chon khong hop le.\n");
-        break;
-      }
-    }
-
-  }while(dd==0);
-
-}
-
-void server_run(int warning){
-  /* warning = 0 nuoc co binh thuong
-    warning = 1  nuoc co chieu tuong
-  */
-  char *p;
-  int x,y,x1,y1;
-  /*Cap nhat nuoc co ma client danh truoc do*/
-  x = run_demo.x;
-  y = run_demo.y;
-  x1 = run_demo.x1;
-  y1 = run_demo.y1;
-  chess[x1][y1]=chess[x][y];
-  chess[x][y]='_';
-  p = strtok(buff,"|");
-  p = strtok(NULL,"|");
-  x=atoi(p);
-  p = strtok(NULL,"|");
-  y=atoi(p);
-  p = strtok(NULL,"|");
-  x1=atoi(p);
-  p = strtok(NULL,"|");
-  y1=atoi(p);
-  /*cap nhat nuoc co ma server danh tra*/
-  chess[x1][y1]=chess[x][y];
-  chess[x][y]='_';
-  printf("Color bang %d\n", color);
-  paint(chess,color);
-  if(warning == 0)
-  {
-    select_run();
-  }
-  else
-  {
-    select_warning();
-  }
-  
-}
-
-void you_win(){
-  printf("************************************\n");
-  printf("********** BAN DA THANG ************\n");
-  printf("************************************\n");
-  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
-}
-
-void computer_win(){
-  printf("************************************\n");
-  printf("********** MAY DA THANG ************\n");
-  printf("************************************\n");
-  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
-}
-
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
   if(strcmp(buff,"HELLO")==0) /*Khoi tao*/
@@ -489,6 +156,321 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+void menu(){
+  char choice[10];
+  printf("=====================================\n");
+  printf("1. Dang nhap\n");
+  printf("2. Tao tai khoan moi\n");
+  printf("3. Huy ket noi\n");
+  printf("=====================================\n");
+
+  printf("Hay lua chon tuy chon: ");
+  gets(choice);
+  printf("-------------------------------------\n");
+  //printf("ban da chon %s\n",choice);
+  strcpy(buff,"SELECT_WORK|");
+  strcat(buff,choice);
+  strcat(buff,"|");
+  /*khuon dang gui SELECT|1|*/
+  //buff[strlen(buff)]='\0';
+  //printf("%s\n",buff);
+}
+////////////////////////////////////////////////////////////////////////////////
+void menu2(){
+  int choice;
+  int dd=0;
+  printf("=====================================\n");
+  printf("1. Dang nhap lai.\n");
+  printf("2. Tao tai khoan moi\n");
+  printf("3. Thoat\n");
+  printf("=====================================\n");
+  do
+  {
+    printf("Nhap vao lua chon cua ban:");
+    scanf("%d", &choice);
+    while(getchar()!='\n');
+    switch(choice){
+      case 1: {
+        lg_user();
+        dd=1;
+        break;
+      }
+      case 2: {
+        sgup_user();
+        dd=1;
+        break;
+      }
+      case 3: {
+        strcpy(buff,"EXIT|");
+        dd=1;
+        break;
+      }
+      default: {
+        printf("Ban vui long nhap lai yeu cau.\n");
+        break;
+      }
+    }
+  }while(dd==0);
+}
+////////////////////////////////////////////////////////////////////////////////
+void lg_user(){
+  char s[80];
+  printf("Nhap ten dang nhap: ");
+  gets(s);
+  printf("-------------------------------------\n");
+  strcpy(buff, "LOGIN_USER|");
+  strcat(buff, s);
+  strcat(buff,"|");
+  printf("%s\n",buff);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+void lg_pass(){
+  char s[80];
+  printf("Nhap mat khau: ");
+  gets(s);
+  printf("-------------------------------------\n");
+  strcpy(buff, "LOGIN_PASS|");
+  strcat(buff, s);
+  strcat(buff,"|");
+
+}
+////////////////////////////////////////////////////////////////////////////////
+void sgup_user(){
+  char s[80];
+  printf("Nhap ten dang ky: ");
+  gets(s);
+  printf("-------------------------------------\n");
+  strcpy(buff, "SIGNUP_USER|");
+  strcat(buff, s);
+  strcat(buff,"|");
+}
+////////////////////////////////////////////////////////////////////////////////
+void sgup_pass(){
+  char s[80];
+  printf("Nhap mat khau: ");
+  gets(s);
+  printf("-------------------------------------\n");
+
+  strcpy(buff, "SIGNUP_PASS|");
+  strcat(buff, s);
+  strcat(buff,"|");
+}
+////////////////////////////////////////////////////////////////////////////////
+void confirm_pass(){
+  char s[80];
+  printf("Xac nhan mat khau: ");
+  gets(s);
+  printf("-------------------------------------\n");
+
+  strcpy(buff, "CONFIRM_PASS|");
+  strcat(buff, s);
+  strcat(buff,"|");
+}
+////////////////////////////////////////////////////////////////////////////////
+void authenticated_menu(){
+  int choice;
+  int dd=0;
+  printf("=====================================\n");
+  printf("1|- Bat dau tro choi.\n");
+  printf("2|- Thoat dang nhap.\n");
+  printf("3|- Huy ket noi.\n");
+  printf("=====================================\n");
+  do
+  {
+    printf("Nhap vao lua chon cua ban:");
+    scanf("%d", &choice);
+    while(getchar()!='\n');
+    switch(choice){
+      case 1: {
+        strcpy(buff,"START_GAME|");
+        dd=1;
+        break;
+      }
+      case 2: {
+        strcpy(buff,"LOGOUT|");
+        dd=1;
+        break;
+      }
+      case 3: {
+        strcpy(buff,"EXIT|");
+        dd=1;
+        break;
+      }
+      default: {
+        printf("Ban vui long nhap lai yeu cau.\n");
+        break;
+      }
+    }
+  }while(dd==0);
+
+}
+////////////////////////////////////////////////////////////////////////////////
+void exit_program(){
+  printf("Ban da huy ket noi thanh cong.\n");
+}
+////////////////////////////////////////////////////////////////////////////////
+void game_ready(){
+  int dd=0;
+  int choice=0;
+  make_chess(chess);
+  paint(chess,3);
+  printf("=====================================\n");
+  printf("1. Trang.\n");
+  printf("2. Den.\n");
+  printf("=====================================\n");
+  do{
+    printf("Vui long nhap vao lua chon cua ban:");
+    scanf("%d",&choice);
+    while(getchar()!='\n');
+    switch(choice){
+      case 1:
+      {
+        strcpy(buff,"COLOR|1|");
+        color = 1;
+        dd = 1;
+        break;
+      }
+      case 2:
+      {
+        strcpy(buff,"COLOR|2|");
+        color = 2;
+        dd = 1;
+        break;
+      }
+      case 3:
+      {
+        printf("**Loi**\nBan vui long nhap lai.\n");
+        break;
+      }
+    }
+  }while(dd==0);
+}
+////////////////////////////////////////////////////////////////////////////////
+void server_run(int warning){
+  /* warning = 0 nuoc co binh thuong
+    warning = 1  nuoc co chieu tuong
+  */
+  char *p;
+  int x,y,x1,y1;
+  /*Cap nhat nuoc co ma client danh truoc do*/
+  x = run_demo.x;
+  y = run_demo.y;
+  x1 = run_demo.x1;
+  y1 = run_demo.y1;
+  chess[x1][y1]=chess[x][y];
+  chess[x][y]='_';
+  p = strtok(buff,"|");
+  p = strtok(NULL,"|");
+  x=atoi(p);
+  p = strtok(NULL,"|");
+  y=atoi(p);
+  p = strtok(NULL,"|");
+  x1=atoi(p);
+  p = strtok(NULL,"|");
+  y1=atoi(p);
+  /*cap nhat nuoc co ma server danh tra*/
+  chess[x1][y1]=chess[x][y];
+  chess[x][y]='_';
+  printf("Color bang %d\n", color);
+  paint(chess,color);
+  if(warning == 0)
+  {
+    select_run();
+  }
+  else
+  {
+    select_warning();
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+void run_error(){
+  /*Xu ly khi nuoc co nhap vao bi loi*/
+  printf("**Loi**Nuoc co ban chon khong hop le, vui long nhap lai.\n");
+  select_run();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void select_run(){
+  char x1[2],y1[2],x[2],y[2];
+  /*x, y la toa do chon
+  x1, y1 la toa do di den*/
+  printf("Nhap vao quan co ban chon:\n");
+  printf("Toa do hang:");
+  gets(x);
+  printf("Toa do cot:");
+  gets(y);
+  //scanf("%d %d",&x1,&y1);
+  printf("Nhap vao vi tri ban muon toi:\n");
+  printf("Toa do hang:");
+  gets(x1);
+  printf("Toa do cot:");
+  gets(y1);
+  /*luu lai duong di truoc khi gui qua server kiem tra*/
+  run_demo.x=atoi(x);
+  run_demo.y=atoi(y);
+  run_demo.x1=atoi(x1);
+  run_demo.y1=atoi(y1);
+  strcpy(buff,"RUN|");
+  strcat(buff,x);
+  strcat(buff,"|");
+  strcat(buff,y);
+  strcat(buff,"|");
+  strcat(buff,x1);
+  strcat(buff,"|");
+  strcat(buff,y1);
+  strcat(buff,"|");
+}
+////////////////////////////////////////////////////////////////////////////////
+void select_warning(){
+  int choice;
+  int dd=0;
+  printf("Day la nuoc co chieu tuong, ban co chiu thua khong?.\n");
+  printf("=====================================\n");
+  printf("1. Co.\n");
+  printf("2. Khong.\n");
+  printf("=====================================\n");
+  do{
+    printf("Vui long nhap vao lua chon cua ban:");
+    scanf("%d",&choice);
+    switch(choice){
+      case 1:
+      {
+        strcpy(buff,"END_RUN");
+        dd=1;
+        break;
+      }
+      case 2:
+      {
+        select_run();
+        dd=1;
+        break;
+      }
+      default:
+      {
+        printf("**Loi**Ban da nhap vao tuy chon khong hop le.\n");
+        break;
+      }
+    }
+
+  }while(dd==0);
+}
+////////////////////////////////////////////////////////////////////////////////
+void you_win(){
+  printf("************************************\n");
+  printf("********** BAN DA THANG ************\n");
+  printf("************************************\n");
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
+}
+////////////////////////////////////////////////////////////////////////////////
+void computer_win(){
+  printf("************************************\n");
+  printf("********** MAY DA THANG ************\n");
+  printf("************************************\n");
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
+}
+////////////////////////////////////////////////////////////////////////////////
 int main(){
   
   client_sock=socket(AF_INET,SOCK_STREAM,0);
