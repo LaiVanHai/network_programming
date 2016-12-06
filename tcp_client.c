@@ -14,7 +14,7 @@ char buff[1024];
 struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
 int chess[9][9];
-int color;
+int color=0;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
 ////////////////////////////////////////////////////////////////////////////////
 
