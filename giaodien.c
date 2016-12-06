@@ -37,12 +37,21 @@ void make_chess(int chess[9][9])
   chess[7][3]='H';chess[7][4]='W';
   
 }
-void paint(int chess[8][8]){
+void paint(int chess[8][8], int x){
+  /* x=0 nguoi choi chon den, 1 nguoi choi chon trang */
   int i,j;
   printf("--------------------------------------------------------------------\n");
   printf("       0\t1\t 2\t 3\t 4\t 5\t 6\t 7\t\n");
   printf("____________________________________________________________________\t");
-  printf("--->Den<---\n");
+  if(x==0)
+  {
+    printf("--->Den(H)<---\n");
+  }
+  else
+  {
+    printf("--->Den<---\n");
+  }
+  
 
   for(i=0;i<=7;i++){
     printf("   ||\n");
@@ -56,7 +65,12 @@ void paint(int chess[8][8]){
     printf("\n");
   }
   printf("____________________________________________________________________\t");
-  printf("--->Trang<---\n");
+  if(x==0)
+  {
+    printf("--->Trang<---\n");    
+  }else{
+    printf("--->Trang(H)<---\n");    
+  }
 }
 int main(){
   make_chess();

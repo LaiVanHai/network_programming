@@ -12,9 +12,10 @@ typedef struct{
 }UserType;
 
 typedef struct{
-	char chess;
 	int x;
 	int y;
+	int x1;
+	int y1;
 	int status; 
 	/*
 		1: nuoc co binh thuong

@@ -166,7 +166,7 @@ void authenticated_menu(){
 
 }
 
-void exit_programm(){
+void exit_program(){
   printf("Ban da huy ket noi thanh cong.\n");
 }
 
@@ -174,7 +174,7 @@ void game_ready(){
   int dd=0;
   int choice=0;
   make_chess(chess);
-  paint(chess);
+  paint(chess,color);
   printf("=====================================\n");
   printf("1. Trang.\n");
   printf("2. Den.\n");
@@ -208,16 +208,105 @@ void game_ready(){
 }
 
 void select_run(){
-  int id,x,y,x1,y1;
-  printf("Nhap vao quan co ban chon:");
-  scanf("%d %d",&x1,&y1);
-  printf("Nhap vao toa do:");
-  scanf("%d",&x);
-  scanf("%d",&y);
+  char x1[2],y1[2],x[2],y[2];
+  printf("Nhap vao quan co ban chon:\n");
+  printf("Toa do hang:");
+  gets(x1);
+  printf("Toa do cot:");
+  gets(y1);
+  //scanf("%d %d",&x1,&y1);
+  printf("Nhap vao vi tri ban muon toi:\n");
+  printf("Toa do hang:");
+  gets(x);
+  printf("Toa do cot:");
+  gets(y);
+  strcpy(buff,"RUN|");
+  strcat(buff,x1);
+  strcat(buff,"|");
+  strcat(buff,y1);
+  strcat(buff,"|");
+  strcat(buff,x);
+  strcat(buff,"|");
+  strcat(buff,y);
+  strcat(buff,"|");
 }
 
-void server_run(){
+void select_warning(){
+  int choice;
+  int dd=0;
+  printf("Day la nuoc co chieu tuong, ban co chiu thua khong?.\n");
+  printf("=====================================\n");
+  printf("1. Co.\n");
+  printf("2. Khong.\n");
+  printf("=====================================\n");
+  do{
+    printf("Vui long nhap vao lua chon cua ban:");
+    scanf("%d",&choice);
+    switch(choice){
+      case 1:
+      {
+        strcpy(buff,"END_RUN");
+        dd=1;
+        break;
+      }
+      case 2:
+      {
+        select_run();
+        dd=1;
+        break;
+      }
+      default:
+      {
+        printf("**Loi**Ban da nhap vao tuy chon khong hop le.\n");
+        break;
+      }
+    }
 
+  }while(dd==0);
+
+}
+
+void server_run(int warning){
+  /* warning = 0 nuoc co binh thuong
+    warning = 1  nuoc co chieu tuong
+  */
+  char *p;
+  int x,y,x1,y1;
+  p = strtok(buff,"|");
+  p = strtok(NULL,"|");
+  x=atoi(p);
+  p = strtok(NULL,"|");
+  y=atoi(p);
+  p = strtok(NULL,"|");
+  x1=atoi(p);
+  p = strtok(NULL,"|");
+  y1=atoi(p);
+  chess[x1][y1]=chess[x][y];
+  chess[x][y]='_';
+  paint(chess,color);
+  if(warning == 0)
+  {
+    select_run();
+  }
+  else
+  {
+    select_warning();
+  }
+  
+}
+
+void you_win(){
+  printf("************************************\n");
+  printf("********** BAN DA THANG ************\n");
+  printf("************************************\n");
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
+}
+
+void computer_win(){
+  printf("************************************\n");
+  printf("********** MAY DA THANG ************\n");
+  printf("************************************\n");
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }
 
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
@@ -331,21 +420,40 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       select_run();
       return 1;
     }
-    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
-    {
-      exit_programm();
-      return 0;
-    }
     if(buff[strlen(buff)-1]=='|'){
       char str[1024];
       char *p;
+      printf("Check run.\n");
       strcpy(str, buff);
       p = strtok(str,"|");
-      if(strcmp(p,"RUN")==0){
-        server_run(); /*hien thi nuoc co cua phia server*/
+      if(strcmp(p,"RUN")==0){ /*day la nuoc co binh thuong ma server gui den*/
+        server_run(0); /*hien thi nuoc co cua phia server*/
         return 1;
       }
-
+      if(strcmp(p,"RUN_W")==0){ /*day la nuoc co chieu tuong ma server gui den*/
+        server_run(1); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+    }
+    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
+    {
+      exit_program();
+      return 0;
+    }
+    if(strcmp(buff, "YOU_WIN") == 0); /*Huy ket noi thanh cong*/
+    {
+      you_win();
+      return 1;
+    }
+    if(strcmp(buff, "COMPUTER_WIN") == 0); /*Huy ket noi thanh cong*/
+    {
+      computer_win();
+      return 1;
+    }
+    if(strcmp(buff, "RUN_ERROR") == 0); /*Huy ket noi thanh cong*/
+    {
+      run_error();
+      return 0;
     }
   return 0;
 }

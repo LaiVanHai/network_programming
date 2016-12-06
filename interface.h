@@ -7,25 +7,25 @@ void make_chess(int chess[9][9])
   for(i=1;i<=6;i++)
     {
       if(i==1)
-	{
-	   for(j=0;j<=7;j++)
-	{
-	  chess[i][j]='o';
-	}
-	}
+    	{
+      	   for(j=0;j<=7;j++)
+      	{
+      	  chess[i][j]='o';
+      	}
+    	}
       else
       if(i==6)
-	{
-	   for(j=0;j<=7;j++)
-	{
-	  chess[i][j]='O';
-	}
-	}
+    	{
+      	   for(j=0;j<=7;j++)
+      	{
+      	  chess[i][j]='O';
+      	}
+    	}
       else
       for(j=0;j<=7;j++)
-	{
-	  chess[i][j]='_';
-	}
+    	{
+    	  chess[i][j]='_';
+    	}
     }
   chess[0][0]='x';chess[7][0]='X';chess[0][7]='x';chess[7][7]='X';
   chess[0][1]='m';chess[7][1]='M';chess[0][6]='m';chess[7][6]='M';
@@ -34,12 +34,21 @@ void make_chess(int chess[9][9])
   chess[7][3]='H';chess[7][4]='W';
   
 }
-void paint(int chess[9][9]){
+void paint(int chess[9][9], int x){
+  /* x=2 nguoi choi chon den, 1 nguoi choi chon trang */
   int i,j;
   printf("--------------------------------------------------------------------\n");
   printf("       0\t1\t 2\t 3\t 4\t 5\t 6\t 7\t\n");
   printf("____________________________________________________________________\t");
-  printf("--->Den<---\n");
+  if(x==2)
+  {
+    printf("--->Den(H)<---\n");
+  }
+  else
+  {
+    printf("--->Den<---\n");
+  }
+  
 
   for(i=0;i<=7;i++){
     printf("   ||\n");
@@ -53,7 +62,11 @@ void paint(int chess[9][9]){
     printf("\n");
   }
   printf("____________________________________________________________________\t");
-  printf("--->Trang<---\n");
+  if(x==1)
+  {
+    printf("--->Trang<---\n");    
+  }else{
+    printf("--->Trang(H)<---\n");    
+  }
 }
-
 #endif
