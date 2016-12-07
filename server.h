@@ -1,5 +1,7 @@
 #ifndef __SERVER__
 #define __SERVER__
+
+int Check_Mess(char recv_data[1024], int conn_soc);/*Xac thuc nhung yeu cau cua ben client gui toi*/
 void sig_chld(int signo); /*xu ly goi tin sig*/
 int Check_Send(int conn_soc, int bytes_sent);/*kiem tra trang thai gui du lieu toi client*/
 int Check_Recv(int conn_soc, int bytes_recv);/*kiem tra trang thai nhan du lieu tu client*/
@@ -21,5 +23,5 @@ int Check_User(char str[1024], int conn_soc);/*kiem tra tai khoan co yeu cau dan
 int Check_Login_Pass(char str[1024], int conn_soc);/*kiem tra mat khau dang nhap*/
 int Ready_Signup(int conn_soc);/*xu ly yeu cau dang ky tai khoan moi tu phia client*/
 int Signup_User(char str[1024], int conn_soc);/*dang ky tai khoan moi*/
-int Check_Mess(char recv_data[1024], int conn_soc);/*Xac thuc nhung yeu cau cua ben client gui toi*/
+
 #endif 
