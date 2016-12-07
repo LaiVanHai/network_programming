@@ -7,10 +7,14 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
+#include "my_type.h"
+
 int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
+
+StatusType status = unauthenticated;
 ////////////////////////////////////////////////////////////////////////////////
 void menu(){
   char choice[10];
@@ -19,7 +23,6 @@ void menu(){
   printf("3.Huy ket noi\n");
   printf("Hay lua chon tuy chon: ");
   gets(choice);
-  //printf("ban da chon %s\n",choice);
   strcpy(buff,"SELECT_WORK|");
   strcat(buff,choice);
   strcat(buff,"|");
@@ -27,14 +30,25 @@ void menu(){
   //buff[strlen(buff)]='\0';
   //printf("%s\n",buff);
 }
-////////////////////////////////////////////////////////////////////////////////
-void menu2(){
+///////////////////////////////////////////////////////////////////////////////
+void menu_lg_success(){
   int choice;
-  printf("1.Tao tai khoan moi\n");
-  printf("2.Exit\n");
+  printf("1.Start game\n");
+  printf("2.Logout\n");
+  printf("3.Huy ket noi(Exit)\n");
+  printf("Hay lua chon tuy chon: ");
   scanf("%d%*c", &choice);
-  if(choice == 1) strcmp(buff, "SIGN_UP");
-  else strcmp(buff, "EXIT");
+  switch(choice){
+  case 1:
+    strcpy(buff, "START_GAME");
+    break;
+  case 2:
+    strcpy(buff, "LOGOUT");
+    break;
+  case 3:
+    strcpy(buff, "EXIT");
+    break;
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void lg_user(){
@@ -147,6 +161,11 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       printf("Ban bi huy ket noi.\n");
       return 0;
     }
+  /*************************************/
+  if(strcmp(buff, "LOGIN_SUCCESS") ==0){
+    menu_lg_success();
+    return 1;
+  }
   ////////////////////////////SIGNUP////////////////////////////////
   if(strcmp(buff, "SIGNUP") ==0) /*Chuyen qua giao dien signup*/
     {
@@ -190,21 +209,21 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 }
 
 int main(){
-  
+
   client_sock=socket(AF_INET,SOCK_STREAM,0);
-  
+
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(5500);
   server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
   int dd=1;
-  
+
   if(connect(client_sock,(struct sockaddr*)&server_addr,sizeof(struct sockaddr))!=0){
     printf("\nError!Can not connect to sever!Client exit imediately! ");
     return 0;
   }
-  
+
   do
-    {		
+    {
       bytes_received = recv(client_sock,buff,1024,0);
       if(bytes_received == -1){
     	printf("\nError!Cannot receive data from sever!\n");
@@ -222,7 +241,7 @@ int main(){
         }
       }
       else dd=0;
-    }while(dd==1);	
+    }while(dd==1);
   close(client_sock);
   return 0;
 }
