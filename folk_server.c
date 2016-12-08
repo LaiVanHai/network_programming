@@ -534,7 +534,6 @@ int Check_Run(char string[1024], int conn_soc){
 		return Check_Send(conn_sock,bytes_sent);
     	//return 1;
     }
-
 }
 
 int End_Game(int conn_soc){
