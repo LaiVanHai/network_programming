@@ -1,6 +1,7 @@
 #include"my_type.h"
 #include"ai.h"
 #include"server.h"
+#include"database.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -170,10 +171,10 @@ int Check_User(char str[1024], int conn_soc){ // kiem tra khi client gui ve user
 	p = strtok(str,"|");
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	strcpy(username,p);
-	if(Find_User(username)==1)
+	if(Find_User(username,&user)==1)
 	{
 		//send("LOGIN_USER_ID_OK");
-		status = specified_id;/*chuyen qua trang thai xac nhan password */
+		//status = specified_id;/*chuyen qua trang thai xac nhan password */
 		bytes_sent = send(conn_sock,"LOGIN_USER_ID_OK",22,0);
 		return Check_Send(conn_sock,bytes_sent);
 	}
@@ -257,7 +258,7 @@ int Signup_User(char str[1024], int conn_soc){
 		p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 		strcpy(username,p);
 		printf("Username:%s\n",username);
-		if(Find_User(username)==1)
+		if(Find_User(username, &user)==1)
 		{
 			//send("USER_ID_EXISTED");
 			bytes_sent = send(conn_sock,"USER_ID_EXISTED",22,0);
@@ -534,6 +535,7 @@ int Check_Run(char string[1024], int conn_soc){
 		return Check_Send(conn_sock,bytes_sent);
     	//return 1;
     }
+
 }
 
 int End_Game(int conn_soc){
@@ -571,7 +573,7 @@ int Check_Send(int conn_soc, int bytes_sent){
 
 int Check_Recv(int conn_soc, int bytes_recv){
 	if(bytes_recv<0)
-	{
+	{																																																				
 		printf("\nError!Can not receive data from client!");
 		close(conn_soc);
 		return -1;
@@ -605,43 +607,6 @@ void Clear(){
 	user.online=0;
 }
 
-int Find_User(char s1[1024])
-{
-	// TIM KIEM USER TRONG DATABASE
-	// Cap nhat mat khau va tai khoan  vao trong bien user
-	// password luu lai trong bien nay la password da duoc giai ma
-	char s[80];
-	char username1[80];
-	char *p; 
-	if((f1=fopen("password.txt","r+"))==NULL)
-    {
-      printf("File server error!!\n");
-      return 0;
-    }
-	while(fgets(s,80,f1)!=NULL)
-	{
-		p=strtok(s,"\t"); //user va pass phan cach boi dau tab
-		strcpy(username1,p);
-		if(strcmp(s1,username1)==0)
-		{
-			strcpy(user.username, s1); /*luu lai ten dang nhap cua nguoi dung*/
-			p=strtok(NULL,"\n");
-			strcpy(user.password,decode(p)); // tim kiem lai mat khau
-			return 1;
-		}
-	}
-	fclose(f1);
-	return 0;
-}
-
-void Update_Database(char user[1024],char pass[1024]){
-	f1=fopen("password.txt","a+");
-	fputs(user,f1);
-	fputs("\t",f1);
-	fputs(pass,f1);
-	fputs("\n",f1);
-	fclose(f1);
-}
 
 int main(){
 

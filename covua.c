@@ -182,7 +182,7 @@ int check_knight(int array[8][8], int color, int x, int y, int x1, int y1){
   i = y + 2;
   j = y - 2;
   if((i==y1 && i<=7 && i>=0)||(j == y1 && j<=7 && j>=0)){
-    //printf("Quan ma di theo phuong ngang.\n");
+    printf("Quan ma di theo phuong ngang.\n");
       i = x + 1;
       j = x - 1;
       if((i==x1 && i<=7 && i>=0)||(j==x1 && j<=7 && j>=0)){
@@ -195,7 +195,7 @@ int check_knight(int array[8][8], int color, int x, int y, int x1, int y1){
     i = x + 2;
     j = x - 2;
     if((i==x1 && i<=7 && i>=0)||(j == x1 && j<=7 && j>=0)){
-     // printf("Quan ma di theo phuong doc.\n");
+      printf("Quan ma di theo phuong doc.\n");
       i = y + 1;
       j = y - 1;
       if((i==y1 && i<=7 && i>=0)||(j==y1 && j<=7 && j>=0)){
