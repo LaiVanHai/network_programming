@@ -3,6 +3,7 @@
 #include"server.h"
 #include"database.h"
 #include"check_login.h"
+#include"check_signup.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -54,6 +55,7 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"LOGIN_PASS")==0){
 		// kiem tra pass co trung khop hay khong
+		printf("Login: %s\n", user.username);
 		return Check_Login_Pass(recv_data, conn_soc, user, &retry);
 	}
 	if(strcmp(p,"SIGNUP")==0){
@@ -63,15 +65,16 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"SIGNUP_USER")==0){
 		// kiem tra ten tai khoan dang ky moi
-		return Signup_User(recv_data, conn_soc);
+		return Signup_User(recv_data, conn_soc, &user);
 	}
 	if(strcmp(p,"SIGNUP_PASS")==0){
 		//	tao mat khau cho tai khoan dang ki moi
-		return Signup_Pass(recv_data, conn_soc,0);
+		return Signup_Pass(recv_data, conn_soc, 0, &retry, &user);
 	}
 	if(strcmp(p,"CONFIRM_PASS")==0){
 		// xac nhan lai mat khau dang ki
-		return Signup_Pass(recv_data,conn_soc,1);
+		printf("Vao confirm roi, pass la:%s\n", username);
+		return Signup_Pass(recv_data, conn_soc, 1, &retry, &user);
 	}
 	if(strcmp(p,"LOGOUT")==0){
 		// nguoi dung muon thoat dang nhap
@@ -162,125 +165,6 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 }
 
 
-int Ready_Signup(int conn_soc){
-
-	//if(status == unauthenticated){
-		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-		// Chuan bi cho cong viec dang ki tai khoan moi
-		// Dua bien luu user hien tai ve trang thai rong
-		status = signup; /* cap nhat lai trang thai dang ki */
-		//send("READY_SIGNUP");
-		bytes_sent = send(conn_sock,"READY_SIGNUP",22,0);
-		return Check_Send(bytes_sent); 
-	//}
-	//return 0;
-}
-
-int Signup_User(char str[1024], int conn_soc){
-	char *p;
-
-	//if(status == signup){
-		printf("Username 1:%s\n",str);
-		/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-		p = strtok(str,"|");
-		p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-		strcpy(username,p);
-		printf("Username:%s\n",username);
-		if(Find_User(username, &user)==1)
-		{
-			//send("USER_ID_EXISTED");
-			bytes_sent = send(conn_sock,"USER_ID_EXISTED",22,0);
-			return Check_Send(bytes_sent);
-		}
-		else
-		{
-			//send("SIGNUP_USER_ID_OK");
-			status = signup_pass; /*chuuyen qua trang thai nhap password de dang ki*/
-			bytes_sent = send(conn_sock,"SIGNUP_USER_ID_OK",22,0);
-			return Check_Send(bytes_sent);
-		}
-
-	//}
-	//return 0; 
-	
-}
-
-int Signup_Pass(char str[1024], int conn_soc, int confirm){
-	char *p;
-	char confirm_password[1024];
-
-	// if(status != enter_password|| status != confirm_pass){
-	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
-	// 	return 0; 
-	// }
-
-	p = strtok(str,"|");
-	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-	if(confirm==0)// mat khau moi nhap lan dau
-	{
-		if(strlen(p)<6){
-			if(retry<5){
-				retry++;
-				//send("PASS_SHORT");/*mat khau client nhap vao qua ngan*/
-				//return 1;
-				bytes_sent = send(conn_sock,"PASS_SHORT",22,0);
-				return Check_Send(bytes_sent);
-			}else
-			{
-				Clear();
-				//send("BLOCK"); // nhap sai qua nhieu lan
-				bytes_sent = send(conn_sock,"BLOCK",22,0);
-				return 0; 
-			}
-		}
-		else
-		{
-			retry = 0;
-			//send("CONFIRM_PASS"); /*gui yeu cau nhap mat khau xac thuc*/
-			strcpy(password,p);
-			//status = confirm_pass; /*dat he thong ve trang thai xac thuc mat khau*/
-			//return 1;
-			bytes_sent = send(conn_sock,"CONFIRM_PASS",22,0);
-			return Check_Send(bytes_sent);
-		}
-	}
-	else
-	{
-		// if(status != confirm_pass){
-		// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
-		// 	return 0; 
-		// }
-		// day la mat khau confirm
-		strcpy(confirm_password,p);
-		if(strcmp(password,confirm_password)==0){
-			retry = 0;
-			//send("SIGNUP_USER_SUCCESS");/*thong bao cho ben client biet la da tao thanh cong tai khoan*/
-			/*Client: goi lai menu giong luc moi dang nhap vao*/
-			//status = unauthenticated; /*dua he thong ve trang thai ban dau*/
-			//return 1;
-			Update_Database(username,encode(password));
-			bytes_sent = send(conn_sock,"SIGNUP_USER_SUCCESS",22,0);
-			return Check_Send(bytes_sent);
-		}	
-		else{
-			if(retry<5){
-				retry++;
-				// send("CONFIRM_NOT_MATCH"); gui yeu cau ben client nhap lai mat khau xac nhan
-				// return 1;
-				bytes_sent = send(conn_sock,"CONFIRM_NOT_MATCH",22,0);
-				return Check_Send(bytes_sent);
-			}else
-			{
-				retry = 0;
-				Clear();
-				//send("BLOCK"); // nhap sai qua nhieu lan
-				bytes_sent = send(conn_sock,"BLOCK",22,0);
-				return 0; 
-			}
-		}
-	}
-}
-	
 
 int Check_Logout(char recv_data[1024], int conn_soc){
 	// if(status != authenticated){
@@ -487,32 +371,13 @@ int Exit_Connect(int conn_sock){
 	return 0; // lua chon huy ket noi
 }
 
-
-char* encode(char* str) {
-   int i = 0;
- 
-   while (str[i] != '\0') {
-      str[i] = str[i] - 30;  // Subtract 30 From Charcter
-      i++;
-   }
-   return (str);
-}
-
-char* decode(char* str) {
-   int i = 0;
- 
-   while (str[i] != '\0') {
-      str[i] = str[i] + 30;  // Subtract 30 From Charcter
-      i++;
-   }
-   return (str);
-}
-
 void Clear(){
 	strcpy(user.username," ");
 	strcpy(user.password," ");
 	user.online=0;
 }
+
+
 
 int main(){
 

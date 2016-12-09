@@ -1,6 +1,27 @@
 #ifndef __DATABASE__
 #define __DATABASE__
 #include"my_type.h"
+
+char* encode(char* str) {
+   int i = 0;
+ 
+   while (str[i] != '\0') {
+      str[i] = str[i] - 30;  // Subtract 30 From Charcter
+      i++;
+   }
+   return (str);
+}
+
+char* decode(char* str) {
+   int i = 0;
+ 
+   while (str[i] != '\0') {
+      str[i] = str[i] + 30;  // Subtract 30 From Charcter
+      i++;
+   }
+   return (str);
+}
+
 int Find_User(char *s1, UserType *user)
 {
 	// TIM KIEM USER TRONG DATABASE
@@ -40,5 +61,7 @@ void Update_Database(char user[1024],char pass[1024]){
 	fputs("\n",f1);
 	fclose(f1);
 }
+
+
 
 #endif
