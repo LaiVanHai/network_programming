@@ -2,6 +2,7 @@
 #include"ai.h"
 #include"server.h"
 #include"database.h"
+#include"check_login.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -18,7 +19,7 @@ UserType user; // luu thong tin cua user
 StatusType status = unauthenticated; // trang thai he thong
 PlayStatus play_status = not_play; // trang thai cua game
 int data[9][9]; //  du lieu ban co
-char username[1024];
+char *username;
 char password[1024]; 
 int retry=0; // dem so lan nhap sai
 int listen_sock, conn_sock; /* file descriptors */
@@ -49,11 +50,11 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"LOGIN_USER")==0){
 		// tim user trong he thong
-		return Check_User(recv_data, conn_soc); 
+		return Check_User(recv_data, conn_soc, username, &user); 
 	}
 	if(strcmp(p,"LOGIN_PASS")==0){
 		// kiem tra pass co trung khop hay khong
-		return Check_Login_Pass(recv_data,conn_soc);
+		return Check_Login_Pass(recv_data, conn_soc, user, &retry);
 	}
 	if(strcmp(p,"SIGNUP")==0){
 		// chuan bi cho viec tao tai khoan moi
@@ -128,14 +129,14 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 			//send("LOGIN");
 			printf("READY_LOGIN\n");
 			bytes_sent = send(conn_sock,"READY_LOGIN",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 		case 2: // lua chon dang ki
 		{
 			retry = 0;
 			//send("READY_SIGNUP");
 			bytes_sent = send(conn_sock,"READY_SIGNUP",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 		case 3:
 		{
@@ -150,7 +151,7 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 			{
 				//send("SELECT_ERROR");
 				bytes_sent = send(conn_sock,"SELECT_ERROR",22,0);
-				return Check_Send(conn_sock,bytes_sent);
+				return Check_Send(bytes_sent);
 			}
 			else
 				//send("BLOCK");// huy ket noi
@@ -160,79 +161,6 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 	}
 }
 
-int Check_User(char str[1024], int conn_soc){ // kiem tra khi client gui ve username
-	char *p;
-
-	// if(status != unauthenticated){
-	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
-	// 	return 0; 
-	// }
-	printf("Check_User 1|%s\n",str);
-	p = strtok(str,"|");
-	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-	strcpy(username,p);
-	if(Find_User(username,&user)==1)
-	{
-		//send("LOGIN_USER_ID_OK");
-		//status = specified_id;/*chuyen qua trang thai xac nhan password */
-		bytes_sent = send(conn_sock,"LOGIN_USER_ID_OK",22,0);
-		return Check_Send(conn_sock,bytes_sent);
-	}
-	else
-	{
-		//send("LOGIN_USER_NOT_EXIST");
-		bytes_sent = send(conn_sock,"LOGIN_USER_NOT_EXIST",22,0);
-		return Check_Send(conn_sock,bytes_sent);
-		/*
-			Client se dua ra 3 lua chon
-			- 1 tiep tuc dang nhap lai
-			- 2 tao tai khoan moi
-			- 3 thoat
-		*/
-	}
-	
-}
-
-int Check_Login_Pass(char str[1024], int conn_soc){
-	char *p;
-	char password[1024];
-
-	// if(status != specified_id){
-	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
-	// 	return 0; 
-	// }
-
-	p = strtok(str,"|");
-	p = strtok(NULL,"|"); // lay phan password ma client gui ve
-	strcpy(password,p); // luu lai pass dang ki cua nguoi dung
-	if(strcmp(password,user.password)==0)
-	{
-		retry=0;
-		strcpy(user.username,username);
-		strcmp(user.password,password);
-		user.online=1;/*dat trang thai user thanh online*/
-		status = authenticated; /*dua he thong ve trang thai da dang nhap*/
-		//send("LOGIN_SUCCESS");
-		bytes_sent = send(conn_sock,"LOGIN_SUCCESS",22,0);
-		return Check_Send(conn_sock,bytes_sent);
-	}
-	else{
-		retry++;
-		if(retry<5) // cho nhap sai toi da 5 lan
-			{
-				//send("PASS_NOT_MATCH");
-				bytes_sent = send(conn_sock,"PASS_NOT_MATCH",22,0);
-				return Check_Send(conn_sock,bytes_sent);
-			}
-			else
-			{
-				Clear();
-				//send("BLOCK");// huy ket noi
-				bytes_sent = send(conn_sock,"BLOCK",22,0);
-				return 0; // nhap sai qua nhieu, huy ket noi
-			}
-	}
-}
 
 int Ready_Signup(int conn_soc){
 
@@ -243,7 +171,7 @@ int Ready_Signup(int conn_soc){
 		status = signup; /* cap nhat lai trang thai dang ki */
 		//send("READY_SIGNUP");
 		bytes_sent = send(conn_sock,"READY_SIGNUP",22,0);
-		return Check_Send(conn_sock,bytes_sent); 
+		return Check_Send(bytes_sent); 
 	//}
 	//return 0;
 }
@@ -262,14 +190,14 @@ int Signup_User(char str[1024], int conn_soc){
 		{
 			//send("USER_ID_EXISTED");
 			bytes_sent = send(conn_sock,"USER_ID_EXISTED",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 		else
 		{
 			//send("SIGNUP_USER_ID_OK");
 			status = signup_pass; /*chuuyen qua trang thai nhap password de dang ki*/
 			bytes_sent = send(conn_sock,"SIGNUP_USER_ID_OK",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 
 	//}
@@ -296,7 +224,7 @@ int Signup_Pass(char str[1024], int conn_soc, int confirm){
 				//send("PASS_SHORT");/*mat khau client nhap vao qua ngan*/
 				//return 1;
 				bytes_sent = send(conn_sock,"PASS_SHORT",22,0);
-				return Check_Send(conn_sock,bytes_sent);
+				return Check_Send(bytes_sent);
 			}else
 			{
 				Clear();
@@ -313,7 +241,7 @@ int Signup_Pass(char str[1024], int conn_soc, int confirm){
 			//status = confirm_pass; /*dat he thong ve trang thai xac thuc mat khau*/
 			//return 1;
 			bytes_sent = send(conn_sock,"CONFIRM_PASS",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 	}
 	else
@@ -332,7 +260,7 @@ int Signup_Pass(char str[1024], int conn_soc, int confirm){
 			//return 1;
 			Update_Database(username,encode(password));
 			bytes_sent = send(conn_sock,"SIGNUP_USER_SUCCESS",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}	
 		else{
 			if(retry<5){
@@ -340,7 +268,7 @@ int Signup_Pass(char str[1024], int conn_soc, int confirm){
 				// send("CONFIRM_NOT_MATCH"); gui yeu cau ben client nhap lai mat khau xac nhan
 				// return 1;
 				bytes_sent = send(conn_sock,"CONFIRM_NOT_MATCH",22,0);
-				return Check_Send(conn_sock,bytes_sent);
+				return Check_Send(bytes_sent);
 			}else
 			{
 				retry = 0;
@@ -372,7 +300,7 @@ int Check_Logout(char recv_data[1024], int conn_soc){
 		Clear();// xoa tai khoan dang dang nhap
 		//send("LOGOUT_SUCCESS");
 		bytes_sent = send(conn_sock,"LOGOUT_SUCCESS",22,0);
-		return Check_Send(conn_sock,bytes_sent);
+		return Check_Send(bytes_sent);
 		//status = unauthenticated;
 		/* thong bao nguoi dung thoat dang nhap thanh cong
  		va quay lai trang thai nhu khi nhan thong diep HELLO
@@ -389,7 +317,7 @@ int Start_Game(int conn_soc){
 	// 	return 0; 
 	// }
 	bytes_sent = send(conn_sock,"GAME_READY",22,0);
-	return Check_Send(conn_sock,bytes_sent);
+	return Check_Send(bytes_sent);
 	//send("GAME_READY"); 
 	//play_status = select_color; /*dua game vao trang thai chon mau*/
 	/* nhan duoc thong diep nay client cho nguoi dung chon mau quan co*/
@@ -422,14 +350,14 @@ int Check_Color(char str[1024], int conn_soc){
 			//send("RUN|6|3|4|3");/*gui ve phia client nuoc co cua server*/
 			//return 1;
 			bytes_sent = send(conn_sock,"RUN|6|3|4|3|",32,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 		if(number == 1){
 			// nguoi dung chon quan mau trang
 			color = 2;
 			//send("COLOR_OK");
 			bytes_sent = send(conn_sock,"COLOR_OK",22,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
 		}
 		//return 1;
 	// }
@@ -480,7 +408,7 @@ int Check_Run(char string[1024], int conn_soc){
     	if(run.status == 0){
     		//send("YOU_WIN"); // client thang
     		bytes_sent = send(conn_sock,"YOU_WIN",32,0);
-			return Check_Send(conn_sock,bytes_sent);
+			return Check_Send(bytes_sent);
     		//play_status = not_play; /*dua game ve trang thai chua bat dau*/
     		/**************************
     		gui file co pho ve phia client
@@ -511,7 +439,7 @@ int Check_Run(char string[1024], int conn_soc){
 	    		strcpy(buff2,"RUN|");
 	    		strcat(buff2,buff);
 	    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-				return Check_Send(conn_sock,bytes_sent);
+				return Check_Send(bytes_sent);
 	    	}
 	    	if(run.status == 2)
 	    	{
@@ -519,7 +447,7 @@ int Check_Run(char string[1024], int conn_soc){
 	    		strcpy(buff2,"RUN_W|");
 	    		strcat(buff2,buff);
 	    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-				return Check_Send(conn_sock,bytes_sent);
+				return Check_Send(bytes_sent);
 	    		/*ben client:
 	    			1: ban choi tiep
 	    			2: ban chiu thua 
@@ -532,7 +460,7 @@ int Check_Run(char string[1024], int conn_soc){
     	/*Neu nuoc co cua client nhap vao bi loi*/
     	//send("RUN_ERROR");
     	bytes_sent = send(conn_sock,"RUN_ERROR",22,0);
-		return Check_Send(conn_sock,bytes_sent);
+		return Check_Send(bytes_sent);
     	//return 1;
     }
 
@@ -541,7 +469,7 @@ int Check_Run(char string[1024], int conn_soc){
 int End_Game(int conn_soc){
 	//send("COMPUTER_WIN");
 	bytes_sent = send(conn_sock,"COMPUTER_WIN",22,0);
-	return Check_Send(conn_sock,bytes_sent);
+	return Check_Send(bytes_sent);
 	//play_status = not_play; /*dua game ve trang thai chua bat dau*/
 	/**************************
 	gui file co pho ve phia client
@@ -559,27 +487,6 @@ int Exit_Connect(int conn_sock){
 	return 0; // lua chon huy ket noi
 }
 
-
-
-int Check_Send(int conn_soc, int bytes_sent){
-	if(bytes_sent<0)
-	{
-		printf("\nError!Can not sent data to client!");
-		close(conn_soc);
-		return -1;
-	}
-	return 1;
-}
-
-int Check_Recv(int conn_soc, int bytes_recv){
-	if(bytes_recv<0)
-	{																																																				
-		printf("\nError!Can not receive data from client!");
-		close(conn_soc);
-		return -1;
-	}
-	return 1;	
-}
 
 char* encode(char* str) {
    int i = 0;
@@ -606,7 +513,6 @@ void Clear(){
 	strcpy(user.password," ");
 	user.online=0;
 }
-
 
 int main(){
 
@@ -640,20 +546,21 @@ int main(){
 			close(listen_sock);
 			printf("You got a connection from %s\n",inet_ntoa(client.sin_addr) ); /* prints client's IP */
 			bytes_sent = send(conn_sock,"HELLO",22,0); /* send to the client welcome message */
-			if (Check_Send(conn_sock,bytes_sent) < 0){
+			if (Check_Send(bytes_sent) < 0){
 				continue;
 			}
 			int check_status =1; /*bien kiem soat qua trinh lam viec voi client*/
 
 			do{
 				bytes_received = recv(conn_sock,recv_data,1024,0); //blocking
-				if (Check_Recv(conn_sock,bytes_received) < 0){
+				if (Check_Recv(bytes_received) < 0){
 					close(conn_sock);
 				}
 				else{
 					recv_data[bytes_received] = '\0';
 					printf("*** From Cllient: %s\n",recv_data);
-					if(Check_Mess(recv_data, conn_sock) == 0){
+					if(Check_Mess(recv_data, conn_sock) <= 0){
+						close(conn_sock);
 						check_status=0;
 					}
 				}

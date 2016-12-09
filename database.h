@@ -1,7 +1,7 @@
 #ifndef __DATABASE__
 #define __DATABASE__
 #include"my_type.h"
-int Find_User(char s1[1024], UserType *user)
+int Find_User(char *s1, UserType *user)
 {
 	// TIM KIEM USER TRONG DATABASE
 	// Cap nhat mat khau va tai khoan  vao trong bien user
