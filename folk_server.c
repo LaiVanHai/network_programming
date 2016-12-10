@@ -22,7 +22,7 @@ PlayStatus play_status = not_play; // trang thai cua game
 int data[9][9]; //  du lieu ban co
 char *username;
 char password[1024]; 
-int retry=0; // dem so lan nhap sai
+int retry = 0; // dem so lan nhap sai
 int listen_sock, conn_sock; /* file descriptors */
 char recv_data[1024];
 int bytes_sent, bytes_received;

@@ -65,9 +65,9 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       sgup_user();
       return 1;
     }
-  if(strcmp(buff, "USER_ID_EXISTED") == 0) /*Tai khoan da ton tai*/
+  if(strcmp(buff, "USER_ID_NOT_INVALID") == 0) /*Tai khoan nhap vao khong hop le*/
     {
-      printf("Tai khoan da ton tai, moi nhap lai\n");
+      printf("Tai khoan khong hop le, moi nhap lai\n");
       sgup_user();
       return 1;
     }
