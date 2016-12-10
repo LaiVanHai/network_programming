@@ -15,7 +15,7 @@ int Send_Result(int conn_sock);/*gui file log ve client*/
 int Check_Run(char string[1024], int conn_soc);/*kiem tra duong di nuoc co ma client gui toi*/
 int End_Game(int conn_soc);/*xu ly khi client chiu thua server*/
 int Check_Color(char str[1024], int conn_soc);/*kiem tra va xac nhan mau quan co ben phia client*/
-int Check_Logout(char recv_data[1024], int conn_soc);/*xac thuc yeu cau thoat dang nhap cua client*/
+//int Check_Logout(char recv_data[1024], int conn_soc);/*xac thuc yeu cau thoat dang nhap cua client*/
 int Start_Game(int conn_soc);/*xu ly yeu cau bat dau tro choi tu phia client*/
 //int Signup_Pass(char str[1024], int conn_soc, int confirm);/*xu ly dang ky mat khau cho tai khoan moi*/
 //void Update_Database(char user[1024],char pass[1024]);/*cap nhat du lieu nguoi dung vao database*/

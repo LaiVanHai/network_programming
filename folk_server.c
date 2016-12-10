@@ -165,35 +165,6 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 }
 
 
-
-int Check_Logout(char recv_data[1024], int conn_soc){
-	// if(status != authenticated){
-	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
-	// 	return 0; 
-	// }
-	// if(user.online==0){
-	// 	// nguoi dung chua dang nhap
-	// 	send("LOGOUT_NOT_SUCCESS"); 
-	// 	 thong bao nguoi dung chua dang nhap
-	// 	va quay lai trang thai nhu khi nhan thong diep HELLO
-		
-	// 	return 1;
-	// }
-	// else
-	{
-		Clear();// xoa tai khoan dang dang nhap
-		//send("LOGOUT_SUCCESS");
-		bytes_sent = send(conn_sock,"LOGOUT_SUCCESS",22,0);
-		return Check_Send(bytes_sent);
-		//status = unauthenticated;
-		/* thong bao nguoi dung thoat dang nhap thanh cong
- 		va quay lai trang thai nhu khi nhan thong diep HELLO
-		*/
-		//return 0;
-	}
-}
-
-
 int Start_Game(int conn_soc){
 	// if(status != authenticated || play_status != not_play){
 	// 	phai dang nhap moi choi game duoc

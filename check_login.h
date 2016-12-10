@@ -14,6 +14,7 @@
 int Check_User(char str[1024], int conn_sock, char *username, UserType *user);
 int Check_Login_Pass(char str[1024], int conn_sock, UserType user, int *retry);
 int Check_Login_Pass_Error(int conn_sock, int *retry);
+int Check_Logout(char recv_data[1024], int conn_sock);
 
 int bytes_sent;
 
@@ -117,6 +118,33 @@ int Check_Login_Pass_Error(int conn_sock, int *retry){
 			bytes_sent = send(conn_sock,"BLOCK",22,0);
 			return 0; // nhap sai qua nhieu, huy ket noi
 		}
+}
+
+int Check_Logout(char recv_data[1024], int conn_sock){
+	// if(status != authenticated){
+	// 	 nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay 
+	// 	return 0; 
+	// }
+	// if(user.online==0){
+	// 	// nguoi dung chua dang nhap
+	// 	send("LOGOUT_NOT_SUCCESS"); 
+	// 	 thong bao nguoi dung chua dang nhap
+	// 	va quay lai trang thai nhu khi nhan thong diep HELLO
+		
+	// 	return 1;
+	// }
+	// else
+	{
+		Clear();// xoa tai khoan dang dang nhap
+		//send("LOGOUT_SUCCESS");
+		bytes_sent = send(conn_sock,"LOGOUT_SUCCESS",22,0);
+		return Check_Send(bytes_sent);
+		//status = unauthenticated;
+		/* thong bao nguoi dung thoat dang nhap thanh cong
+ 		va quay lai trang thai nhu khi nhan thong diep HELLO
+		*/
+		//return 0;
+	}
 }
 
 #endif
