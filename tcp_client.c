@@ -5,7 +5,7 @@ int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
-int chess[9][9];
+int *chess[9];
 int color=0;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
@@ -119,6 +119,14 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       select_run();
       return 1;
     }
+
+    if(strcmp(buff, "RUN_ERROR") == 0); /*Duong di phia client nhap bi loi*/
+    {
+      paint(chess,color);
+      run_error();
+      return 1;
+    } 
+
     if(buff[strlen(buff)-1]=='|'){
       char str[1024];
       char *p;
@@ -138,20 +146,15 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       exit_program();
       return 0;
     }
-    if(strcmp(buff, "YOU_WIN") == 0); /*Huy ket noi thanh cong*/
+    if(strcmp(buff, "YOU_WIN") == 0); /*Client chien thang*/
     {
       you_win();
       return 1;
     }
-    if(strcmp(buff, "COMPUTER_WIN") == 0); /*Huy ket noi thanh cong*/
+    if(strcmp(buff, "COMPUTER_WIN") == 0); /*Server chien thang*/
     {
       computer_win();
       return 1;
-    }
-    if(strcmp(buff, "RUN_ERROR") == 0); /*Huy ket noi thanh cong*/
-    {
-      run_error();
-      return 0;
     }
   return 0;
 }
@@ -314,6 +317,8 @@ void exit_program(){
 void game_ready(){
   int dd=0;
   int choice=0;
+  for(int i = 0; i < 9; i++)
+    chess[i] = (int*)malloc(9*sizeof(int));
   make_chess(chess);
   paint(chess,3);
   printf("=====================================\n");
@@ -387,7 +392,7 @@ void server_run(int warning){
 ////////////////////////////////////////////////////////////////////////////////
 void run_error(){
   /*Xu ly khi nuoc co nhap vao bi loi*/
-  printf("**Loi**Nuoc co ban chon khong hop le, vui long nhap lai.\n");
+  printf("**Loi** Nuoc co ban chon khong hop le, vui long nhap lai.\n");
   select_run();
 }
 
@@ -503,7 +508,10 @@ int main(){
           exit(-1);
         }
       }
-      else dd=0;
+      else {
+          printf("Co van de.\n");
+          dd=0;
+        }
     }while(dd==1);	
   close(client_sock);
   return 0;

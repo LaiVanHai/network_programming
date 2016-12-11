@@ -1,7 +1,7 @@
 #ifndef __INTERFACE__
 #define __INTERFACE__
 #include<stdio.h>
-void make_chess(int chess[9][9])
+void make_chess(int **chess)
 {
   int i,j;
   for(i=1;i<=6;i++)
@@ -34,7 +34,7 @@ void make_chess(int chess[9][9])
   chess[7][3]='H';chess[7][4]='W';
   
 }
-void paint(int chess[9][9], int x){
+void paint(int **chess, int x){
   /* x=2 nguoi choi chon den, 1 nguoi choi chon trang */
   /* x=3 nguoi dung chua chon mau*/
   int i,j;

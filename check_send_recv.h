@@ -1,14 +1,6 @@
 #ifndef __CHECK_SEND_RECV__
 #define __CHECK_SEND_RECV__
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
+
 
 int Check_Send(int bytes_sent){
 	if(bytes_sent<0)

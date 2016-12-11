@@ -1,9 +1,12 @@
-#include"my_type.h"
-#include"ai.h"
-#include"server.h"
-#include"database.h"
-#include"check_login.h"
-#include"check_signup.h"
+#include "my_type.h"
+#include "ai.h"
+#include "server.h"
+#include "database.h"
+#include "check_login.h"
+#include "check_signup.h"
+#include "status_game.h"
+#include "check_game.h"
+#include "interface.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -32,7 +35,7 @@ pid_t pid;
 int sin_size;
 FILE *f1;
 int color; // luu mau quan co ben phia client
-int chess[9][9]; // ban co 
+int *chess[9]; // ban co 
 
 void sig_chld(int signo){
 	pid_t pid;
@@ -83,15 +86,20 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"START_GAME")==0){
 		// nhan yeu cau bat dau tro choi cua nguoi dung
+		/*khoi tao ban co*/
+		for(int i = 0; i < 9; i++)
+   	    chess[i] = (int*)malloc(9*sizeof(int));
+   		make_chess(chess);
 		return Start_Game(conn_soc);
 	}
 	if(strcmp(p,"COLOR")==0){
 		// nguoi choi da chon mau quan co, bat dau tro choi
-		return Check_Color(recv_data,conn_soc);
+		return Check_Color(recv_data, conn_soc, chess, &color);
 	}
 	if(strcmp(p,"RUN")==0){
 		// nhan nuoc co tu phia client
-		return Check_Run(recv_data,conn_soc);
+		paint(chess, color);
+		return Check_Run(recv_data, conn_soc, chess, color);
 	}
 	if(strcmp(p,"END_RUN")==0){
 		// nhan duoc thong bao chiu thua tu phia client
@@ -164,179 +172,6 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 	}
 }
 
-
-int Start_Game(int conn_soc){
-	// if(status != authenticated || play_status != not_play){
-	// 	phai dang nhap moi choi game duoc
-	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-	// 	return 0; 
-	// }
-	bytes_sent = send(conn_sock,"GAME_READY",22,0);
-	return Check_Send(bytes_sent);
-	//send("GAME_READY"); 
-	//play_status = select_color; /*dua game vao trang thai chon mau*/
-	/* nhan duoc thong diep nay client cho nguoi dung chon mau quan co*/
-	//return 1;
-}
-
-
-int Check_Color(char str[1024], int conn_soc){
-	char *p;
-	int number;
-
-	// if(status != authenticated || play_status != select_color){
-	// 	phai dang nhap moi choi game duoc
-	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-	// 	return 0; 
-	// }
-
-	p = strtok(str,"|");
-	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
-	number = atoi(p);
-	// if(number == 2){ // 1: trang, 2: den
-	// 	//send("COLOR_OK");
-	// 	bytes_sent = send(conn_sock,"COLOR_OK",22,0);
-	// 	return Check_Send(conn_sock,bytes_sent);
-		//play_status = play; /*dat game vao trang thai choi*/
-		/*mau trang di truoc*/
-		if(number == 2){
-			// may se la nguoi danh truoc
-			color = 1;
-			//send("RUN|6|3|4|3");/*gui ve phia client nuoc co cua server*/
-			//return 1;
-			bytes_sent = send(conn_sock,"RUN|6|3|4|3|",32,0);
-			return Check_Send(bytes_sent);
-		}
-		if(number == 1){
-			// nguoi dung chon quan mau trang
-			color = 2;
-			//send("COLOR_OK");
-			bytes_sent = send(conn_sock,"COLOR_OK",22,0);
-			return Check_Send(bytes_sent);
-		}
-		//return 1;
-	// }
-	// else
-	// {
-	// 	//send("COLOR_ERROR");
-	// 	bytes_sent = send(conn_sock,"COLOR_ERROR",22,0);
-	// 	return Check_Send(conn_sock,bytes_sent);
-	// 	//return 1;
-	// }
-	
-}
-
-
-int Check_Run(char string[1024], int conn_soc){
-	char *p;
-	int x,x1; // toa do hang
-	int y,y1; // toa do cot
-	char buff[1024];
-	char buff2[1024];
-	char str[5];
-	//RunType run;
-
-
-	// if(status != authenticated || play_status != play){
-	// 	/*phai dang nhap moi choi game duoc*/
-	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-	// 	return 0; 
-	// }
-
-	p = strtok(string,"|");
-	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
-	x = atoi(p); 
-	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
-	y = atoi(p); 
-	p = strtok(NULL,"|");
-	x1 = atoi(p); /* lay toa do hang cua nuoc toi*/ 
-    p = strtok(NULL,"|");
-    y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
-
-    if(check_chess_run(chess, color, x1, y1, x , y)>0){ 
-    	// check_run _ ai.h
-    	//duong di cua phia client la hop le
-    	/*
-    		AI: tinh toan duong di doi pho
-    	*/
-    	RunType run = find_way(chess,color); /* ai.h gui vao mang va mau quan co cua phia client*/
-    	if(run.status == 0){
-    		//send("YOU_WIN"); // client thang
-    		bytes_sent = send(conn_sock,"YOU_WIN",32,0);
-			return Check_Send(bytes_sent);
-    		//play_status = not_play; /*dua game ve trang thai chua bat dau*/
-    		/**************************
-    		gui file co pho ve phia client
-    		***************************/
-    	}
-    	else
-    	{
-	    	x = run.x;
-	    	sprintf(str, "%d", x);
-	    	/*chuyen so thanh xau*/
-	    	strcpy(buff,str);
-	    	strcat(buff,"|");
-	    	y = run.y;
-	    	sprintf(str, "%d", y);/*chuyen so thanh xau*/
-	    	strcat(buff,str);
-	    	strcat(buff,"|");
-	    	x1 = run.x1;
-	    	sprintf(str, "%d", x1);/*chuyen so thanh xau*/
-	    	strcat(buff,str);
-	    	strcat(buff,"|");
-	    	y1 = run.y1;
-	    	sprintf(str, "%d", y1);/*chuyen so thanh xau*/
-	    	strcat(buff,str);
-	    	strcat(buff,"|");
-	    	if(run.status == 1)
-	    	{
-	    		//send("RUN|chess|x|y"); // neu day la nuoc co binh thuong
-	    		strcpy(buff2,"RUN|");
-	    		strcat(buff2,buff);
-	    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-				return Check_Send(bytes_sent);
-	    	}
-	    	if(run.status == 2)
-	    	{
-	    		//send("RUN_W|chess|x|y"); // neu day la nuoc co chieu tuong
-	    		strcpy(buff2,"RUN_W|");
-	    		strcat(buff2,buff);
-	    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-				return Check_Send(bytes_sent);
-	    		/*ben client:
-	    			1: ban choi tiep
-	    			2: ban chiu thua 
-	    		*/
-	    	}
-    	}	
-    }
-    else
-    {
-    	/*Neu nuoc co cua client nhap vao bi loi*/
-    	//send("RUN_ERROR");
-    	bytes_sent = send(conn_sock,"RUN_ERROR",22,0);
-		return Check_Send(bytes_sent);
-    	//return 1;
-    }
-
-}
-
-int End_Game(int conn_soc){
-	//send("COMPUTER_WIN");
-	bytes_sent = send(conn_sock,"COMPUTER_WIN",22,0);
-	return Check_Send(bytes_sent);
-	//play_status = not_play; /*dua game ve trang thai chua bat dau*/
-	/**************************
-	gui file co pho ve phia client
-	***************************/
-}
-
-int Send_Result(int conn_sock){
-	/*Thao tac gui file ve phia client*/
-	return 1;
-}
-
-
 int Exit_Connect(int conn_sock){
 	bytes_sent = send(conn_sock,"EXIT_OK",22,0);
 	return 0; // lua chon huy ket noi
@@ -347,8 +182,6 @@ void Clear(){
 	strcpy(user.password," ");
 	user.online=0;
 }
-
-
 
 int main(){
 
