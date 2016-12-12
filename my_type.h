@@ -16,7 +16,8 @@ typedef struct{
 	int y;
 	int x1;
 	int y1;
-	int status; 
+	int status;
+	int x2; /*fix loi tam thoi x khong luu gia tri*/ 
 	/*
 		1: nuoc co binh thuong
 		2: nuoc co chieu tuong
@@ -39,5 +40,6 @@ typedef enum {
 	check_run, /*trang thai kiem tra nuoc di*/
 	play /*trang thai choi*/
 }PlayStatus;
+
 
 #endif

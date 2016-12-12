@@ -76,7 +76,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
     p = strtok(NULL,"|");
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
 
-    if(check_chess_run(chess, color, x1, y1, x , y)>0){ 
+    if(check_chess_run(chess, color, x, y, x1 , y1)>0){ 
     	// check_run _ ai.h
     	//duong di cua phia client la hop le
     	chess[x1][y1] = chess[x][y];
@@ -114,6 +114,12 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 	    	sprintf(str, "%d", y1);/*chuyen so thanh xau*/
 	    	strcat(buff,str);
 	    	strcat(buff,"|");
+	    	chess[x1][y1] = chess[x][y];
+    		chess[x][y]= '_';
+
+    		/*hien thi ban co sau khi cap nhat nuoc co cua client va server*/
+    		paint(chess,color);
+	    	
 	    	if(run.status == 1)
 	    	{
 	    		//send("RUN|chess|x|y"); // neu day la nuoc co binh thuong

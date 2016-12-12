@@ -3,6 +3,7 @@
 
 #include "my_type.h"
 #include "check_chess_run.h"
+#include "interface.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -46,6 +47,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1)
 		return -1;
 	}
 	if(chess[x][y]=='_'){
+		//printf("day la quan co%c\n",chess[x][y]);
 		/*chon quan co o vi tri trong khong*/
 		return -1;
 	}

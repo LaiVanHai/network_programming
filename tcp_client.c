@@ -7,6 +7,7 @@ struct sockaddr_in server_addr;
 int bytes_sent,bytes_received;
 int *chess[9];
 int color=0;
+int first_run=1;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
@@ -119,14 +120,6 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       select_run();
       return 1;
     }
-
-    if(strcmp(buff, "RUN_ERROR") == 0); /*Duong di phia client nhap bi loi*/
-    {
-      paint(chess,color);
-      run_error();
-      return 1;
-    } 
-
     if(buff[strlen(buff)-1]=='|'){
       char str[1024];
       char *p;
@@ -141,6 +134,14 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
         return 1;
       }
     }
+
+    if(strcmp(buff, "RUN_ERROR") == 0); /*Duong di phia client nhap bi loi*/
+    {
+      paint(chess,color);
+      run_error();
+      return 1;
+    } 
+
     if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
     {
       exit_program();
@@ -359,26 +360,33 @@ void server_run(int warning){
   */
   char *p;
   int x,y,x1,y1;
-  /*Cap nhat nuoc co ma client danh truoc do*/
-  x = run_demo.x;
+  x = run_demo.x2; /*Loi x khong luu gia tri*/
   y = run_demo.y;
   x1 = run_demo.x1;
   y1 = run_demo.y1;
-  chess[x1][y1]=chess[x][y];
-  chess[x][y]='_';
+  if(first_run==1){
+    /*neu la nuoc co dau tien thi khong can cap nhap nuoc co truoc do*/
+    first_run = 0;
+  }
+  else
+  {
+   /*Cap nhat nuoc co ma client danh truoc do*/
+    chess[x1][y1]=chess[x][y];
+    chess[x][y]='_';
+  }
+  
   p = strtok(buff,"|");
   p = strtok(NULL,"|");
-  x=atoi(p);
+  x = atoi(p);
   p = strtok(NULL,"|");
-  y=atoi(p);
+  y = atoi(p);
   p = strtok(NULL,"|");
-  x1=atoi(p);
+  x1 = atoi(p);
   p = strtok(NULL,"|");
-  y1=atoi(p);
+  y1 = atoi(p);
   /*cap nhat nuoc co ma server danh tra*/
   chess[x1][y1]=chess[x][y];
   chess[x][y]='_';
-  printf("Color bang %d\n", color);
   paint(chess,color);
   if(warning == 0)
   {
@@ -401,12 +409,15 @@ void select_run(){
   char x1[2],y1[2],x[2],y[2];
   /*x, y la toa do chon
   x1, y1 la toa do di den*/
+  if(first_run==1){
+    /*xoa di trang thai chua danh nuoc co nao*/
+    first_run = 0;
+  }
   printf("Nhap vao quan co ban chon:\n");
   printf("Toa do hang:");
   gets(x);
   printf("Toa do cot:");
   gets(y);
-  //scanf("%d %d",&x1,&y1);
   printf("Nhap vao vi tri ban muon toi:\n");
   printf("Toa do hang:");
   gets(x1);
@@ -417,6 +428,8 @@ void select_run(){
   run_demo.y=atoi(y);
   run_demo.x1=atoi(x1);
   run_demo.y1=atoi(y1);
+  run_demo.x2=atoi(x); /*loi x khong luu gia tri*/
+
   strcpy(buff,"RUN|");
   strcat(buff,x);
   strcat(buff,"|");
@@ -432,6 +445,7 @@ void select_warning(){
   int choice;
   int dd=0;
   printf("Day la nuoc co chieu tuong, ban co chiu thua khong?.\n");
+
   printf("=====================================\n");
   printf("1. Co.\n");
   printf("2. Khong.\n");
@@ -479,7 +493,6 @@ void computer_win(){
 int main(){
   
   client_sock=socket(AF_INET,SOCK_STREAM,0);
-  
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(5500);
   server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -509,7 +522,6 @@ int main(){
         }
       }
       else {
-          printf("Co van de.\n");
           dd=0;
         }
     }while(dd==1);	
