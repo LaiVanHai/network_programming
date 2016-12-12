@@ -68,7 +68,46 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1)
 		{
 			return check_knight(chess,color,x,y,x1,y1);
 		}
-
+		case 'o':
+		{
+			return check_pawn(chess,color,x,y,x1,y1);
+		}
+	    case 'O':
+	    {
+	      	return check_pawn(chess,color,x,y,x1,y1);
+	  	}
+	    case 'x':
+	    {
+	      	return check_rock(chess,color,x,y,x1,y1);
+	    }
+	    case 'X':
+	    {
+	      	return check_rock(chess,color,x,y,x1,y1);
+	    }
+	    case 't':
+	    {
+	      	return check_bishop(chess,color,x,y,x1,y1);
+	    }
+	    case 'T':
+	    {
+	      	return check_bishop(chess,color,x,y,x1,y1);
+	    }
+	    case 'h':
+	    {
+	      	return check_queen(chess,color,x,y,x1,y1);
+	    }
+	    case 'H':
+	    {
+	      	return check_queen(chess,color,x,y,x1,y1);
+	    }
+	    case 'w':
+	    {
+	      	return check_king(chess,color,x,y,x1,y1);
+	    }
+	    case 'W':
+	    {
+	      	return check_king(chess,color,x,y,x1,y1);
+	    }
 	}
 }
  
@@ -79,11 +118,26 @@ int Random(int n)
 
 
 RunType find_way(int **a, int color){
+	int color_server;
+	int dd=0;
+	if(color==1)
+	{
+		color_server = 2;
+	}
+	else
+	{
+		color_server = 1;
+	}
+
 	RunType run_type;
-	run_type.x= Random(7);
-	run_type.y= Random(7);
-	run_type.x1= Random(7);
-	run_type.y1= Random(7);
+	
+	do{
+		run_type.x= Random(7);
+		run_type.y= Random(7);
+		run_type.x1= Random(7);
+		run_type.y1= Random(7);
+		dd = check_chess_run(a,color_server,run_type.x,run_type.y,run_type.x1,run_type.y1);
+	}while(dd!=1);
 	a[run_type.x1][run_type.y1] = a[run_type.x][run_type.y];
 	a[run_type.x][run_type.y] = '_';
 	run_type.status=1;
