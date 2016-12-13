@@ -8,36 +8,36 @@
 #include <stdlib.h>
 #include <time.h>
 
-int check_color(int **array, int color, int x, int y, int x1, int y1);/*kiem tra su hop le ve mau*/
+int check_color(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra su hop le ve mau*/
 int check_chess_run(int **chess, int color, int x, int y, int x1, int y1); /*Kiem tra duong di cua quan co*/
 RunType find_way(int **a, int color);/*Tim kiem duong di moi cho phia server*/
 
 
-int check_color(int **array, int color, int x, int y, int x1, int y1){
+int check_color(int **chess, int color, int x, int y, int x1, int y1){
     /*return 0: chon nham mau quan co*/
     /*return -1: 2 quan co cung 1 mau*/
     /*return 1: ve mau thi khong co van de gi*/
     /*kiem tra mau quan chon hop le truoc*/
     /*1 - trang, 2 - den*/
     if(color == 1){
-      if(array[x][y] >= 'a' && array[x][y] <= 'z')
+      if(chess[x][y] >= 'a' && chess[x][y] <= 'z')
         return 0;
     }
     else if(color == 2) {
-      if(array[x][y] >= 'A' && array[x][y] <= 'Z')
+      if(chess[x][y] >= 'A' && chess[x][y] <= 'Z')
         return 0;
     }
     /*Kiem tra neu 2 quan co o 2 vi tri  cung 1 mau thi bao loi*/
-    if(array[x1][y1]!='_'){
-      if((array[x][y]>=97) && (array[x][y]<=122)){
-        if((array[x1][y1]>=97) && (array[x1][y1]<=122)){
+    if(chess[x1][y1]!='_'){
+      if((chess[x][y]>=97) && (chess[x][y]<=122)){
+        if((chess[x1][y1]>=97) && (chess[x1][y1]<=122)){
           return -1;
         }
       }
-      if((array[x][y]>=65) && (array[x][y]<=90)){
-        if((array[x1][y1]>=65) && (array[x1][y1]<=90)){
+      if((chess[x][y]>=65) && (chess[x][y]<=90)){
+        if((chess[x1][y1]>=65) && (chess[x1][y1]<=90)){
           return -1;
-        } 
+        }
       }
     }
   return 1;/*khong co van de gi*/
@@ -68,7 +68,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1)
 		case 'm':
 		{
 			return check_knight(chess,color,x,y,x1,y1);
-		}		
+		}
 		case 'M':
 		{
 			return check_knight(chess,color,x,y,x1,y1);
@@ -115,7 +115,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1)
 	    }
 	}
 }
- 
+
 int Random(int n)
 {
    return rand()%(n+1);
@@ -124,6 +124,7 @@ int Random(int n)
 
 RunType find_way(int **a, int color){
 	int color_server;
+    int stempt;
 	int dd=0;
 	if(color==1)
 	{
@@ -135,16 +136,23 @@ RunType find_way(int **a, int color){
 	}
 
 	RunType run_type;
-	
+
 	do{
+        printf(" 140 Server find way.\n");
 		run_type.x= Random(7);
 		run_type.y= Random(7);
 		run_type.x1= Random(7);
 		run_type.y1= Random(7);
+        run_type.x2= run_type.x;
 		dd = check_chess_run(a,color_server,run_type.x,run_type.y,run_type.x1,run_type.y1);
 	}while(dd!=1);
-	a[run_type.x1][run_type.y1] = a[run_type.x][run_type.y];
-	a[run_type.x][run_type.y] = '_';
+    // printf("%d %d %d %d\n",run_type.x2,run_type.y,run_type.x1,run_type.y1);
+	stempt = a[run_type.x2][run_type.y];
+    a[run_type.x1][run_type.y1] = stempt;
+	a[run_type.x2][run_type.y] = '_';
+    //paint(a,color_server);
+    // printf("%c\n", a[run_type.x1][run_type.y1]);
+    // printf("%c\n", a[run_type.x2][run_type.y]);
 	run_type.status=1;
 	return run_type;
 }
