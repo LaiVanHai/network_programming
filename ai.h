@@ -8,6 +8,11 @@
 #include <stdlib.h>
 #include <time.h>
 
+int check_color(int **array, int color, int x, int y, int x1, int y1);/*kiem tra su hop le ve mau*/
+int check_chess_run(int **chess, int color, int x, int y, int x1, int y1); /*Kiem tra duong di cua quan co*/
+RunType find_way(int **a, int color);/*Tim kiem duong di moi cho phia server*/
+
+
 int check_color(int **array, int color, int x, int y, int x1, int y1){
     /*return 0: chon nham mau quan co*/
     /*return -1: 2 quan co cung 1 mau*/

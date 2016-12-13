@@ -98,7 +98,6 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"RUN")==0){
 		// nhan nuoc co tu phia client
-		paint(chess, color);
 		return Check_Run(recv_data, conn_soc, chess, color);
 	}
 	if(strcmp(p,"END_RUN")==0){

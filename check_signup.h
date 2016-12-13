@@ -1,10 +1,10 @@
 #ifndef __CHECK_SIGNUP__
 #define __CHECK_SIGNUP__
-#include"database.h"
+#include "database.h"
 
-int Ready_Signup(int conn_sock);
-int Signup_User(char str[1024], int conn_sock, UserType *user);
-int Check_Signup_Pass_Error(int conn_sock, int *retry, UserType *user);
+int Ready_Signup(int conn_sock);/*Chuan bi dang ki*/
+int Signup_User(char str[1024], int conn_sock, UserType *user);/*Dang khi tai khoan moi*/
+int Check_Signup_Pass_Error(int conn_sock, int *retry, UserType *user);/*Dang ki mat khau cho tai khoan moi*/
 
 int Ready_Signup(int conn_sock){
 

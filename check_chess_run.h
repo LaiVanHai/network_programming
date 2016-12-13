@@ -1,6 +1,14 @@
 #ifndef __CHECK_CHESS_RUN__
 #define __CHECK_CHESS_RUN__
 
+int check_knight(int **array, int color, int x, int y, int x1, int y1);/*kiem tra quan ma*/
+int check_pawn(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan tot*/
+int check_rock(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan xe*/
+int check_king(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan vua*/
+int check_bishop(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan tuong*/
+int check_queen(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan hau*/
+
+
 int check_knight(int **array, int color, int x, int y, int x1, int y1){
   int count=0;/*dem so nuoc toi da ma quan ma co the di*/
   int i;

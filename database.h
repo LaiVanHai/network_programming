@@ -2,6 +2,12 @@
 #define __DATABASE__
 #include"my_type.h"
 
+char* encode(char* str);/*ma hoa mat khau*/
+char* decode(char* str);/*giai ma mat khau*/
+int Find_User(char *s1, UserType *user);/*tim kiem username trong database*/
+void Update_Database(char user[1024],char pass[1024]);/*Update du lieu cua tai khoan moi*/
+
+
 char* encode(char* str) {
    int i = 0;
  

@@ -1,6 +1,10 @@
 #ifndef __INTERFACE__
 #define __INTERFACE__
-#include<stdio.h>
+#include <stdio.h>
+
+void make_chess(int **chess); /*Tao moi ban co*/
+void paint(int **chess, int x); /*Hien thi ban co*/
+
 void make_chess(int **chess)
 {
   int i,j;

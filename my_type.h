@@ -1,9 +1,9 @@
 #ifndef __MY_TYPE__
 #define __MY_TYPE__
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct{
 	char username[1024];

@@ -1,6 +1,10 @@
 #ifndef __CHECK_GAME__
 #define __CHECK_GAME__
 
+int Check_Color(char str[1024], int conn_sock, int **chess, int *color);/*Kiem tra su hop le ve mau quan co*/
+int Check_Run(char string[1024], int conn_sock, int **chess, int color);/*Kiem tra duong di quan co*/
+
+
 int Check_Color(char str[1024], int conn_sock, int **chess, int *color){
 	char *p;
 	int number;
