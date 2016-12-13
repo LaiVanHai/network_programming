@@ -7,7 +7,7 @@ int Start_Game(int conn_sock){
 	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
 	// 	return 0; 
 	// }
-	bytes_sent = send(conn_sock,"GAME_READY",22,0);
+	bytes_sent = send(conn_sock,"READY_GAME",22,0);
 	return Check_Send(bytes_sent);
 	//send("GAME_READY"); 
 	//play_status = select_color; /*dua game vao trang thai chon mau*/

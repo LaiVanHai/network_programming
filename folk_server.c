@@ -151,7 +151,7 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 		case 3:
 		{
 			retry = 0;
-			bytes_sent = send(conn_sock,"EXIT_OK",22,0);
+			bytes_sent = send(conn_sock,"OK_EXIT",32,0);
 			return 0; // lua chon huy ket noi
 		}
 		default:
@@ -172,7 +172,7 @@ int Select_Work(char str[1024], int conn_soc){  /*tuy chon ban dau giua client v
 }
 
 int Exit_Connect(int conn_sock){
-	bytes_sent = send(conn_sock,"EXIT_OK",22,0);
+	bytes_sent = send(conn_sock,"OK_EXIT",22,0);
 	return 0; // lua chon huy ket noi
 }
 

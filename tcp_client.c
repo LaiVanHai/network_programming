@@ -96,6 +96,13 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       authenticated_menu();
       return 1;
     }
+
+    if(strcmp(buff, "READY_GAME") ==0) /*Chon mau quan co de chuan bi choi*/
+    {
+      game_ready();
+      return 1;
+    } 
+
     if(strcmp(buff, "LOGOUT_SUCCESS") ==0) /*Dang ki thanh cong, chuyen qua giao dien menu*/
     {
       printf("You have successfully logout.\n");
@@ -103,21 +110,11 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       return 1;
     }
     
-    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
-    {
-      exit_program();
-      return 0;
-    }
-    if(strcmp(buff, "GAME_READY") ==0) /*Chon mau quan co de chuan bi choi*/
-    {
-      game_ready();
-      return 1;
-    }
     if(strcmp(buff, "COLOR_OK") ==0) /*Nhap vao nuoc co cua phia client*/
     {
       select_run();
       return 1;
-    }
+    }    
     if(buff[strlen(buff)-1]=='|'){
       char str[1024];
       char *p;
@@ -133,22 +130,29 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       }
     }
 
-    if(strcmp(buff, "RUN_ERROR") == 0); /*Duong di phia client nhap bi loi*/
+    if(strcmp(buff, "RUN_ERROR") == 0) /*Duong di phia client nhap bi loi*/
     {
+      printf("Vaop run error %d\n",strcmp(buff, "RUN_ERROR"));
       paint(chess,color);
       run_error();
       return 1;
     } 
-    if(strcmp(buff, "YOU_WIN") == 0); /*Client chien thang*/
+    if(strcmp(buff, "YOU_WIN") == 0) /*Client chien thang*/
     {
       you_win();
       return 1;
     }
-    if(strcmp(buff, "COMPUTER_WIN") == 0); /*Server chien thang*/
+    if(strcmp(buff, "COMPUTER_WIN") == 0) /*Server chien thang*/
     {
       computer_win();
       return 1;
     }
+    if(strcmp(buff, "OK_EXIT") == 0) /*Huy ket noi thanh cong*/
+    {
+      exit_program();
+      return 0;
+    }
+
   return 0;
 }
 
@@ -311,7 +315,7 @@ void game_ready(){
   int dd=0;
   int choice=0;
   for(int i = 0; i < 9; i++)
-    chess[i] = (int*)malloc(9*sizeof(int));
+    chess[i] = (int*)malloc(9*sizeof(int)); 
   make_chess(chess);
   paint(chess,3);
   printf("=====================================\n");
@@ -503,7 +507,7 @@ int main(){
     	close(client_sock);
     	exit(-1);
       }
-      buff[bytes_received] = '\0';
+      //buff[bytes_received] = '\0';
       printf("***From Sever: %s\n", buff);
       if(check_buff(buff) == 1){
         bytes_sent = send(client_sock,buff,strlen(buff),0);
