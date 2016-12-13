@@ -18,7 +18,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "SELECT_ERROR") ==0) /*Nhap loi*/
     {
-      printf("Thao tac nhap loi.vui long nhap lai.\n");
+      printf("**ERORR** Input errors, please re-enter\n");
       menu();
       return 1;
     }
@@ -31,7 +31,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "LOGIN_USER_NOT_EXIST") ==0) /*Nhap tai khoan khong dung*/
     {
-      printf("Tai khoan nhap khong dung.\n");
+      printf("**ERORR** Wrong account\n");
       menu2();
       return 1;
     }
@@ -42,22 +42,14 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "PASS_NOT_MATCH") ==0)
     {
-      printf("Mat khau khong dung,moi nhap lai.\n");
+      printf("**ERORR** Password incorrect, please re-enter\n");
       lg_pass();
       return 1;
     }
-  /***********************************/
-  if(strcmp(buff, "PASS_NOT_MATCH") ==0)
-    {
-      printf("Mat khau khong dung,moi nhap lai.\n");
-      lg_pass();
-      return 1;
-    }
-
   /************************************/
   if(strcmp(buff, "BLOCK") ==0) /*Huy ket noi*/
     {
-      printf("Ban bi huy ket noi.\n");
+      printf(">>>>You disconnected<<<<\n");
       return 0;
     }
   ////////////////////////////SIGNUP////////////////////////////////
@@ -68,7 +60,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "USER_ID_NOT_INVALID") == 0) /*Tai khoan nhap vao khong hop le*/
     {
-      printf("Tai khoan khong hop le, moi nhap lai\n");
+      printf("**ERORR** Invalid account, please re-enter\n");
       sgup_user();
       return 1;
     }
@@ -79,7 +71,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "PASS_SHORT") ==0) /*Password qua ngan*/
     {
-      printf("Mat khau qua ngan, moi nhap lai.\n");
+      printf("**ERORR** Password too short, please re-enter\n");
       sgup_pass();
       return 1;
     }
@@ -90,7 +82,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
   if(strcmp(buff, "CONFIRM_NOT_MATCH") ==0) /*Xac nhan mat khau chua dung*/
     {
-      printf("Xac nhan mat khau chua dung, moi nhap lai.\n");
+      printf("**ERORR** Confirmation password do not match, please re-enter\n");
       confirm_pass();
       return 1;
     }
@@ -106,9 +98,15 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     }
     if(strcmp(buff, "LOGOUT_SUCCESS") ==0) /*Dang ki thanh cong, chuyen qua giao dien menu*/
     {
-      printf("Ban da thoat dang nhap thanh cong.\n");
+      printf("You have successfully logout.\n");
       menu();
       return 1;
+    }
+    
+    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
+    {
+      exit_program();
+      return 0;
     }
     if(strcmp(buff, "GAME_READY") ==0) /*Chon mau quan co de chuan bi choi*/
     {
@@ -141,12 +139,6 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       run_error();
       return 1;
     } 
-
-    if(strcmp(buff, "EXIT_OK") == 0); /*Huy ket noi thanh cong*/
-    {
-      exit_program();
-      return 0;
-    }
     if(strcmp(buff, "YOU_WIN") == 0); /*Client chien thang*/
     {
       you_win();
@@ -164,9 +156,9 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 void menu(){
   char choice[10];
   printf("=====================================\n");
-  printf("1. Dang nhap\n");
-  printf("2. Tao tai khoan moi\n");
-  printf("3. Huy ket noi\n");
+  printf("1. Login.\n");
+  printf("2. Create new account.\n");
+  printf("3. Exit.\n");
   printf("=====================================\n");
 
   printf("Hay lua chon tuy chon: ");
@@ -185,13 +177,13 @@ void menu2(){
   int choice;
   int dd=0;
   printf("=====================================\n");
-  printf("1. Dang nhap lai.\n");
-  printf("2. Tao tai khoan moi\n");
-  printf("3. Thoat\n");
+  printf("1. Re-login.\n");
+  printf("2. Create new account.\n");
+  printf("3. Exit.\n");
   printf("=====================================\n");
   do
   {
-    printf("Nhap vao lua chon cua ban:");
+    printf("=>>You enter into the selection:");
     scanf("%d", &choice);
     while(getchar()!='\n');
     switch(choice){
@@ -211,7 +203,7 @@ void menu2(){
         break;
       }
       default: {
-        printf("Ban vui long nhap lai yeu cau.\n");
+        printf("**ERORR** Please re-enter your selection.\n");
         break;
       }
     }
@@ -220,7 +212,7 @@ void menu2(){
 ////////////////////////////////////////////////////////////////////////////////
 void lg_user(){
   char s[80];
-  printf("Nhap ten dang nhap: ");
+  printf("=>>Enter your username:");
   gets(s);
   printf("-------------------------------------\n");
   strcpy(buff, "LOGIN_USER|");
@@ -232,7 +224,7 @@ void lg_user(){
 
 void lg_pass(){
   char s[80];
-  printf("Nhap mat khau: ");
+  printf("=>>Enter your password:");
   gets(s);
   printf("-------------------------------------\n");
   strcpy(buff, "LOGIN_PASS|");
@@ -243,7 +235,7 @@ void lg_pass(){
 ////////////////////////////////////////////////////////////////////////////////
 void sgup_user(){
   char s[80];
-  printf("Nhap ten dang ky: ");
+  printf("=>>Enter your account name register:");
   gets(s);
   printf("-------------------------------------\n");
   strcpy(buff, "SIGNUP_USER|");
@@ -253,7 +245,7 @@ void sgup_user(){
 ////////////////////////////////////////////////////////////////////////////////
 void sgup_pass(){
   char s[80];
-  printf("Nhap mat khau: ");
+  printf("=>>Enter your password register:");
   gets(s);
   printf("-------------------------------------\n");
 
@@ -264,7 +256,7 @@ void sgup_pass(){
 ////////////////////////////////////////////////////////////////////////////////
 void confirm_pass(){
   char s[80];
-  printf("Xac nhan mat khau: ");
+  printf("=>>Confirm password:");
   gets(s);
   printf("-------------------------------------\n");
 
@@ -277,13 +269,13 @@ void authenticated_menu(){
   int choice;
   int dd=0;
   printf("=====================================\n");
-  printf("1|- Bat dau tro choi.\n");
-  printf("2|- Thoat dang nhap.\n");
-  printf("3|- Huy ket noi.\n");
+  printf("1|- Start game.\n");
+  printf("2|- Logout.\n");
+  printf("3|- Exit.\n");
   printf("=====================================\n");
   do
   {
-    printf("Nhap vao lua chon cua ban:");
+    printf("=>>You enter into the selection:");
     scanf("%d", &choice);
     while(getchar()!='\n');
     switch(choice){
@@ -303,7 +295,7 @@ void authenticated_menu(){
         break;
       }
       default: {
-        printf("Ban vui long nhap lai yeu cau.\n");
+        printf("**ERORR** Please re-enter your selection.\n");
         break;
       }
     }
@@ -312,7 +304,7 @@ void authenticated_menu(){
 }
 ////////////////////////////////////////////////////////////////////////////////
 void exit_program(){
-  printf("Ban da huy ket noi thanh cong.\n");
+  printf("=>>You have successfully exited.\n");
 }
 ////////////////////////////////////////////////////////////////////////////////
 void game_ready(){
@@ -323,11 +315,11 @@ void game_ready(){
   make_chess(chess);
   paint(chess,3);
   printf("=====================================\n");
-  printf("1. Trang.\n");
-  printf("2. Den.\n");
+  printf("1. White.\n");
+  printf("2. Black.\n");
   printf("=====================================\n");
   do{
-    printf("Vui long nhap vao lua chon cua ban:");
+    printf("=>>You enter into the selection:");
     scanf("%d",&choice);
     while(getchar()!='\n');
     switch(choice){
@@ -347,7 +339,7 @@ void game_ready(){
       }
       case 3:
       {
-        printf("**Loi**\nBan vui long nhap lai.\n");
+        printf("**ERORR** Please re-enter your selection.\n");
         break;
       }
     }
@@ -400,7 +392,7 @@ void server_run(int warning){
 ////////////////////////////////////////////////////////////////////////////////
 void run_error(){
   /*Xu ly khi nuoc co nhap vao bi loi*/
-  printf("**Loi** Nuoc co ban chon khong hop le, vui long nhap lai.\n");
+  printf("**ERROR**Move invalid, please re-enter.\n");
   select_run();
 }
 
@@ -413,15 +405,15 @@ void select_run(){
     /*xoa di trang thai chua danh nuoc co nao*/
     first_run = 0;
   }
-  printf("Nhap vao quan co ban chon:\n");
-  printf("Toa do hang:");
+  printf("Enter the location you choose.\n");
+  printf("=>>Coordinates row:");
   gets(x);
-  printf("Toa do cot:");
+  printf("=>>Coordinates column:");
   gets(y);
-  printf("Nhap vao vi tri ban muon toi:\n");
-  printf("Toa do hang:");
+  printf("Enter the location you want to go.\n");
+  printf("=>>Coordinates row:");
   gets(x1);
-  printf("Toa do cot:");
+  printf("=>>Coordinates column:");
   gets(y1);
   /*luu lai duong di truoc khi gui qua server kiem tra*/
   run_demo.x=atoi(x);
@@ -444,14 +436,14 @@ void select_run(){
 void select_warning(){
   int choice;
   int dd=0;
-  printf("Day la nuoc co chieu tuong, ban co chiu thua khong?.\n");
+  printf(">>>WARNING<<<King is in danger, you have to solve it?\n");
 
   printf("=====================================\n");
-  printf("1. Co.\n");
-  printf("2. Khong.\n");
+  printf("1. Yes.\n");
+  printf("2. No.\n");
   printf("=====================================\n");
   do{
-    printf("Vui long nhap vao lua chon cua ban:");
+    printf("=>>You enter into the selection:");
     scanf("%d",&choice);
     switch(choice){
       case 1:
@@ -468,7 +460,7 @@ void select_warning(){
       }
       default:
       {
-        printf("**Loi**Ban da nhap vao tuy chon khong hop le.\n");
+        printf("**ERORR** Please re-enter your selection.\n");
         break;
       }
     }
@@ -478,14 +470,14 @@ void select_warning(){
 ////////////////////////////////////////////////////////////////////////////////
 void you_win(){
   printf("************************************\n");
-  printf("********** BAN DA THANG ************\n");
+  printf("********** YOU_WIN ************\n");
   printf("************************************\n");
   strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }
 ////////////////////////////////////////////////////////////////////////////////
 void computer_win(){
   printf("************************************\n");
-  printf("********** MAY DA THANG ************\n");
+  printf("********** COMPUTER_WIN ************\n");
   printf("************************************\n");
   strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }

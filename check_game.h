@@ -67,13 +67,29 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 	// }
 
 	p = strtok(string,"|");
-	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
+	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/
+	if(p == NULL){
+		bytes_sent = send(conn_sock,"RUN_ERROR",42,0);
+		return Check_Send(bytes_sent);
+	}
 	x = atoi(p); 
 	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
+	if(p == NULL){
+		bytes_sent = send(conn_sock,"RUN_ERROR",42,0);
+		return Check_Send(bytes_sent);
+	}
 	y = atoi(p); 
 	p = strtok(NULL,"|");
+	if(p == NULL){
+		bytes_sent = send(conn_sock,"RUN_ERROR",42,0);
+		return Check_Send(bytes_sent);
+	}
 	x1 = atoi(p); /* lay toa do hang cua nuoc toi*/ 
     p = strtok(NULL,"|");
+    if(p == NULL){
+		bytes_sent = send(conn_sock,"RUN_ERROR",42,0);
+		return Check_Send(bytes_sent);
+	}
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
 
     if(check_chess_run(chess, color, x, y, x1 , y1)>0){ 
