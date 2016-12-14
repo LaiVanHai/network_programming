@@ -1,6 +1,8 @@
 #ifndef __STATUS_GAME__
 #define __STATUS_GAME__
 
+#include "time_machine.h"
+
 int Start_Game(int conn_sock){
 	// if(status != authenticated || play_status != not_play){
 	// 	phai dang nhap moi choi game duoc
@@ -16,8 +18,16 @@ int Start_Game(int conn_sock){
 }
 
 
-int End_Game(int conn_sock){
+int End_Game(int conn_sock,FILE *f1){
+
 	//send("COMPUTER_WIN");
+	char stemp[1024];
+	strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
+	fprintf(f1,"======================================\n");
+	fprintf(f1,"End time: %s\n",stemp);
+	fprintf(f1,"************************************\n");
+  	fprintf(f1,"********** COMPUTER_WIN ************\n");
+  	fprintf(f1,"************************************\n");
 	bytes_sent = send(conn_sock,"COMPUTER_WIN",22,0);
 	return Check_Send(bytes_sent);
 	//play_status = not_play; /*dua game ve trang thai chua bat dau*/

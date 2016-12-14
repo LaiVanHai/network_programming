@@ -5,14 +5,12 @@
 #include <time.h>
 #include <string.h>
 
-char* make_name_file(); /*tao ten file luu du lieu*/
+char* make_name_file(char s[1024]); /*tao ten file luu du lieu*/
 char* scan_time(); /*check thoi gian hien tai cua he thong*/
 
-char* make_name_file(){
+char* make_name_file(char s[1024]){
 	char* p;
-	char s[1024];
 	char result[1024];
-    strcpy(s,scan_time());
     p = strtok(s," ");
     strcpy(result,p);
     strcat(result,"_");

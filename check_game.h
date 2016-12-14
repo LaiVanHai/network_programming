@@ -1,11 +1,14 @@
 #ifndef __CHECK_GAME__
 #define __CHECK_GAME__
 
-int Check_Color(char str[1024], int conn_sock, int **chess, int *color);/*Kiem tra su hop le ve mau quan co*/
-int Check_Run(char string[1024], int conn_sock, int **chess, int color);/*Kiem tra duong di quan co*/
+#include "time_machine.h"
+#include <stdlib.h>
+
+int Check_Color(char str[1024], int conn_sock, int **chess, int *color, FILE *f1);/*Kiem tra su hop le ve mau quan co*/
+int Check_Run(char string[1024], int conn_sock, int **chess, int color, FILE *f1);/*Kiem tra duong di quan co*/
 
 
-int Check_Color(char str[1024], int conn_sock, int **chess, int *color){
+int Check_Color(char str[1024], int conn_sock, int **chess, int *color, FILE *f1){
 	char *p;
 	int number;
 
@@ -19,41 +22,38 @@ int Check_Color(char str[1024], int conn_sock, int **chess, int *color){
 	p = strtok(NULL,"|"); // lay phan du lieu ma client gui ve
 	number = atoi(p);
 	// if(number == 2){ // 1: trang, 2: den
-	// 	//send("COLOR_OK");
-	// 	bytes_sent = send(conn_sock,"COLOR_OK",22,0);
-	// 	return Check_Send(conn_sock,bytes_sent);
-		//play_status = play; /*dat game vao trang thai choi*/
 		/*mau trang di truoc*/
 		if(number == 2){
+			fprintf(f1,"Your chess of color: Black.\n"); /*luu thong tin vao file log*/
+			fprintf(f1,"===============================================\n");
+			fprintf(f1,"=======COMPUTER_RUN======||======YOU_RUN=======\n");
+			fprintf(f1,"=========================||====================\n");
+
 			// may se la nguoi danh truoc
 			*color = 2;
 			chess[4][3] = chess[6][3];
 			chess[6][3] = '_';
 			/*cap nhat lai nuoc co*/
 			bytes_sent = send(conn_sock,"RUN|6|3|4|3|",32,0);
+			fprintf(f1,"%c - 6_3 -> 4_3\t||\t", chess[6][3]);
 			return Check_Send(bytes_sent);
 		}
 		if(number == 1){
 			// nguoi dung chon quan mau trang
+			fprintf(f1,"Your chess of color: White.\n"); /*luu thong tin vao file log*/
+			fprintf(f1,"===============================================\n");
+			fprintf(f1,"=======COMPUTER_RUN======||======YOU_RUN=======\n");
+			fprintf(f1,"=========================||====================\n");
 			*color = 1;
 			//send("COLOR_OK");
 			bytes_sent = send(conn_sock,"COLOR_OK",22,0);
 			return Check_Send(bytes_sent);
 		}
-		//return 1;
-	// }
-	// else
-	// {
-	// 	//send("COLOR_ERROR");
-	// 	bytes_sent = send(conn_sock,"COLOR_ERROR",22,0);
-	// 	return Check_Send(conn_sock,bytes_sent);
-	// 	//return 1;
-	// }
 	
 }
 
 
-int Check_Run(char string[1024], int conn_sock, int **chess, int color){
+int Check_Run(char string[1024], int conn_sock, int **chess, int color, FILE *f1){
 	// color mau quan co ben client
 	char *p;
 	int x,x1; // toa do hang
@@ -61,14 +61,6 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 	char buff[1024];
 	char buff2[1024];
 	char str[5];
-	//RunType run;
-
-
-	// if(status != authenticated || play_status != play){
-	// 	/*phai dang nhap moi choi game duoc*/
-	// 	/* nguoi dung dang o trang thai khong cho phep thuc hien hanh dong nay */
-	// 	return 0; 
-	// }
 
 	p = strtok(string,"|");
 	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/
@@ -101,6 +93,11 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
     	//duong di cua phia client la hop le
     	chess[x1][y1] = chess[x][y];
     	chess[x][y]= '_';
+    	if(color == 2){
+    		fprintf(f1,"%c - %d_%d -> %d_%d\n", chess[x1][y1], x, y, x1, y1);
+    	}else{
+    		fprintf(f1,"%c - %d_%d -> %d_%d\t||\t", chess[x1][y1], x, y, x1, y1);
+    	}
     	/*cap nhat nuoc lai nuoc co*/
     	/*
     		AI: tinh toan duong di doi pho
@@ -110,11 +107,23 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 		x1 = run.x1;
 		y1 = run.y1;
 		x = run.x;
-		y = run.y;    	
-    	
+		y = run.y;   
+
+		if(color == 1){
+    		fprintf(f1,"%c - %d_%d -> %d_%d\n", chess[x1][y1], x, y, x1, y1);
+    	}else{
+    		fprintf(f1,"%c - %d_%d -> %d_%d\t||\t", chess[x1][y1], x, y, x1, y1);
+    	} 	
     	
     	if(run.status == 0){
     		//send("YOU_WIN"); // client thang
+    		char stemp[1024];
+    		strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
+			fprintf(f1,"======================================\n");
+			fprintf(f1,"End time: %s\n",stemp);
+    		fprintf(f1,"************************************\n");
+  			fprintf(f1,"************* YOU_WIN **************\n");
+  			fprintf(f1,"************************************\n");
     		bytes_sent = send(conn_sock,"YOU_WIN",32,0);
 			return Check_Send(bytes_sent);
     		//play_status = not_play; /*dua game ve trang thai chua bat dau*/

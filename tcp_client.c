@@ -474,7 +474,7 @@ void select_warning(){
 ////////////////////////////////////////////////////////////////////////////////
 void you_win(){
   printf("************************************\n");
-  printf("********** YOU_WIN ************\n");
+  printf("************* YOU_WIN **************\n");
   printf("************************************\n");
   strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }

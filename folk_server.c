@@ -7,6 +7,7 @@
 #include "status_game.h"
 #include "check_game.h"
 #include "interface.h"
+#include "time_machine.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -34,14 +35,19 @@ struct sockaddr_in client; /* client's address information */
 pid_t pid;
 int sin_size;
 FILE *f1;
+FILE *store_run;
 int color; // luu mau quan co ben phia client
-int *chess[9]; // ban co 
+int *chess[9]; // ban co
+char file_name[1024]; /*luu thong tin cua */
 
 void sig_chld(int signo){
 	pid_t pid;
 	int stat;
 	while((pid=waitpid(-1,&stat,WNOHANG))>0)
+	{
+		//fclose(store_run);
 		printf("[ForkingServer] Child %d terminated\n",pid);
+	}
 }
 int Check_Mess(char recv_data[1024], int conn_soc){
 	char *p;
@@ -95,15 +101,29 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	}
 	if(strcmp(p,"COLOR")==0){
 		// nguoi choi da chon mau quan co, bat dau tro choi
-		return Check_Color(recv_data, conn_soc, chess, &color);
+		char stemp[1024];
+		strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
+		printf("Stemp %s\n",stemp);
+		strcpy(file_name,make_name_file(stemp)); /*Tao file luu thong tin tran dau*/
+		printf("File name %s\n",file_name);
+   		if((store_run = fopen(file_name,"w+"))==NULL)
+	    {
+	      return 0;
+	    }
+	    else{
+	    	fprintf(store_run,"Start time: %s\n",stemp);
+	    	fprintf(store_run,"Your IP: %s\n",inet_ntoa(client.sin_addr));
+	    	return Check_Color(recv_data, conn_soc, chess, &color, store_run);
+	    }
+		
 	}
 	if(strcmp(p,"RUN")==0){
 		// nhan nuoc co tu phia client
-		return Check_Run(recv_data, conn_soc, chess, color);
+		return Check_Run(recv_data, conn_soc, chess, color, store_run);
 	}
 	if(strcmp(p,"END_RUN")==0){
 		// nhan duoc thong bao chiu thua tu phia client
-		return End_Game(conn_soc);
+		return End_Game(conn_soc,store_run);
 	}
 	if(strcmp(p,"RESULT")==0){
 		// nhan duoc thong bao chiu thua tu phia client
