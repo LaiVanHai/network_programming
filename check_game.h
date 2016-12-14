@@ -78,7 +78,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 	}
 	x = atoi(p); 
 	p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
-	if(p == NULL){
+	if(p == NULL)	{
 		bytes_sent = send(conn_sock,"RUN_ERROR",42,0);
 		return Check_Send(bytes_sent);
 	}
@@ -105,7 +105,14 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
     	/*
     		AI: tinh toan duong di doi pho
     	*/
-    	RunType run = find_way(chess, color); /* ai.h gui vao mang va mau quan co cua phia client*/
+    	int **chess2 = chess;
+    	RunType run = find_way(chess2, color); /* ai.h gui vao mang va mau quan co cua phia client*/
+		x1 = run.x1;
+		y1 = run.y1;
+		x = run.x;
+		y = run.y;    	
+    	
+    	
     	if(run.status == 0){
     		//send("YOU_WIN"); // client thang
     		bytes_sent = send(conn_sock,"YOU_WIN",32,0);

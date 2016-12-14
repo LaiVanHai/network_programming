@@ -138,7 +138,7 @@ RunType find_way(int **a, int color){
 	RunType run_type;
 
 	do{
-        printf(" 140 Server find way.\n");
+       // printf(" 140 Server find way.\n");
 		run_type.x= Random(7);
 		run_type.y= Random(7);
 		run_type.x1= Random(7);
@@ -146,13 +146,6 @@ RunType find_way(int **a, int color){
         run_type.x2= run_type.x;
 		dd = check_chess_run(a,color_server,run_type.x,run_type.y,run_type.x1,run_type.y1);
 	}while(dd!=1);
-    // printf("%d %d %d %d\n",run_type.x2,run_type.y,run_type.x1,run_type.y1);
-	stempt = a[run_type.x2][run_type.y];
-    a[run_type.x1][run_type.y1] = stempt;
-	a[run_type.x2][run_type.y] = '_';
-    //paint(a,color_server);
-    // printf("%c\n", a[run_type.x1][run_type.y1]);
-    // printf("%c\n", a[run_type.x2][run_type.y]);
 	run_type.status=1;
 	return run_type;
 }
