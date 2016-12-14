@@ -47,11 +47,11 @@ void paint(int **chess, int x){
   printf("____________________________________________________________________\t");
   if(x==2)
   {
-    printf("--->Den(H)<---\n");
+    printf("--->Black(H)<---\n");
   }
   else if(x==1||x==3)
   {
-    printf("--->Den<---\n");
+    printf("--->Black<---\n");
   }
   for(i=0;i<=7;i++){
     printf("   ||\n");
@@ -67,11 +67,11 @@ void paint(int **chess, int x){
   printf("____________________________________________________________________\t");
   if(x==2||x==3)
   {
-    printf("--->Trang<---\n");    
+    printf("--->White<---\n");    
   }
   else if(x==1)
   {
-    printf("--->Trang(H)<---\n");    
+    printf("--->White(H)<---\n");    
   }
 }
 #endif

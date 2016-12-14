@@ -87,6 +87,7 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	if(strcmp(p,"START_GAME")==0){
 		// nhan yeu cau bat dau tro choi cua nguoi dung
 		/*khoi tao ban co*/
+		printf("IP adress %s\n",inet_ntoa(client.sin_addr) ); /* prints client's IP */
 		for(int i = 0; i < 9; i++)
    	    chess[i] = (int*)malloc(9*sizeof(int));
    		make_chess(chess);

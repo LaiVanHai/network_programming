@@ -252,7 +252,7 @@ int check_bishop(int **chess, int color, int x, int y, int x1, int y1){
         else return 0;
       }
     }
-    else if(y < y1 && x1-x == y-y1) {
+    else if(y < y1 && x1-x == y1-y) {
       j=y+1;
       for(i=x+1 ; i<x1 ; i++ ){
         if(chess[i][j] != '_')
@@ -393,7 +393,7 @@ int check_queen(int **chess, int color, int x, int y, int x1, int y1){
         else return 0;
       }
     }
-    else if(y < y1 && x1-x == y-y1) {
+    else if(y < y1 && x1-x == y1-y) {
       j=y+1;
       for(i=x+1 ; i<x1 ; i++ ){
         if(chess[i][j] != '_')

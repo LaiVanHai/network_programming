@@ -165,7 +165,7 @@ void menu(){
   printf("3. Exit.\n");
   printf("=====================================\n");
 
-  printf("Hay lua chon tuy chon: ");
+  printf("=>>You enter into the selection:");
   gets(choice);
   printf("-------------------------------------\n");
   //printf("ban da chon %s\n",choice);
