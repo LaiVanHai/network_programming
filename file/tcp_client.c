@@ -476,14 +476,14 @@ void you_win(){
   printf("************************************\n");
   printf("************* YOU_WIN **************\n");
   printf("************************************\n");
-  strcpy(buff,"RESULT|1|"); /*Yeu cau nhan file ket qua tu phai server*/
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }
 ////////////////////////////////////////////////////////////////////////////////
 void computer_win(){
   printf("************************************\n");
   printf("********** COMPUTER_WIN ************\n");
   printf("************************************\n");
-  strcpy(buff,"RESULT|2|"); /*Yeu cau nhan file ket qua tu phai server*/
+  strcpy(buff,"RESULT"); /*Yeu cau nhan file ket qua tu phai server*/
 }
 ////////////////////////////////////////////////////////////////////////////////
 int main(){

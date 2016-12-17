@@ -11,7 +11,6 @@ char* scan_time(); /*check thoi gian hien tai cua he thong*/
 char* make_name_file(char s[1024]){
 	char* p;
 	char result[1024];
-    printf("make time.\n");
     p = strtok(s," ");
     strcpy(result,p);
     strcat(result,"_");
@@ -40,13 +39,13 @@ char* make_name_file(char s[1024]){
 char* scan_time(){
     char *p;
     time_t rawtime; 
-    // struct tm *timeinfo; 
+    struct tm *timeinfo; 
 
     time(&rawtime); 
-    // timeinfo = localtime(&rawtime); 
+    timeinfo = localtime(&rawtime); 
 
-    strcpy(p,asctime(localtime(&rawtime)));
-    printf("scan time.\n");
+    strcpy(p,asctime(timeinfo));
+
     return p;
 }
 

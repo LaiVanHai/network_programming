@@ -7,6 +7,8 @@
 #include "status_game.h"
 #include "check_game.h"
 #include "interface.h"
+#include "time_machine.h"
+#include "make_file.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -16,7 +18,6 @@
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
-#include <time.h>
 #define PORT 5500
 #define BACKLOG 20
 
@@ -36,7 +37,7 @@ pid_t pid;
 int sin_size;
 FILE *f1;
 int color; // luu mau quan co ben phia client
-int *chess[9]; // ban co 
+int *chess[9]; // ban co
 char file_name[1024]; /*luu thong tin cua */
 char stemp[1024];
 char ip_address[1024];
@@ -49,7 +50,9 @@ void sig_chld(int signo){
 	pid_t pid;
 	int stat;
 	while((pid=waitpid(-1,&stat,WNOHANG))>0)
+	{
 		printf("[ForkingServer] Child %d terminated\n",pid);
+	}
 }
 int Check_Mess(char recv_data[1024], int conn_soc){
 	char *p;
@@ -95,7 +98,6 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	if(strcmp(p,"START_GAME")==0){
 		// nhan yeu cau bat dau tro choi cua nguoi dung
 		/*khoi tao ban co*/
-		printf("IP adress %s\n",inet_ntoa(client.sin_addr) ); /* prints client's IP */
 		for(int i = 0; i < 9; i++)
    	    chess[i] = (int*)malloc(9*sizeof(int));
    		make_chess(chess);
@@ -105,89 +107,75 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		// nguoi choi da chon mau quan co, bat dau tro choi
 		char stemp[1024];
 		char stemp2[1024];
-		//strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
-		char *p;
-	    time_t rawtime; 
-	    // struct tm *timeinfo; 
-	    time(&rawtime); 
-	    // timeinfo = localtime(&rawtime); 
-	    strcpy(stemp,asctime(localtime(&rawtime)));
-		strcpy(stemp2,stemp);
-		strcpy(file_name,make_name_file(stemp)); /*Tao file luu thong tin tran dau*/
-		if((store_run = fopen(file_name,"w+"))==NULL)
+		// printf("110.\n");
+		// strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
+		// printf("111\n");
+		// strcpy(stemp2,stemp);
+		// printf("112\n");
+		// strcpy(file_name,make_name_file(stemp)); /*Tao file luu thong tin tran dau*/
+		// printf("114.\n");
+		if((store_run = fopen("haideptrai.txt","w+"))==NULL)
 		    {
 		      printf("**ERROR** Open file error.\n");
 			      return 0;
 		    }
 	    else{
+	    	printf("119.\n");
 	    	fprintf(store_run,"Start time: %s",stemp2);
+	    	printf("121.\n");
 	    	fprintf(store_run,"Your IP: %s\n",ip_address);
-	    	int a = Check_Color(recv_data, conn_soc, chess, &color);
-	    	//if(color == 2) printf("124: %s\n",server_run);
+	    	int a = Check_Color(recv_data, conn_soc, chess, &color,&server_run);
+	    	if(color == 2) printf("124: %s\n",server_run);
 	    	if(a>0){
 	    		if(color == 1){
 					fprintf(store_run,"Your chess of color: White.\n"); /*luu thong tin vao file log*/
 					printf("128.\n");
 					fprintf(store_run,"===============================================\n");
+					printf("130.\n");
+					fprintf(store_run,"========YOU_RUN======||======COMPUTER_RUN=======\n");
+					printf("132.\n");
+					fprintf(store_run,"=====================||=========================\n");
+					printf("134.\n");
 				}else
 				if(color == 2)
 				{
 					fprintf(store_run,"Your chess of color: Black.\n"); /*luu thong tin vao file log*/
 					fprintf(store_run,"===============================================\n");
+					fprintf(store_run,"=======COMPUTER_RUN======||======YOU_RUN=======\n");
+					fprintf(store_run,"=========================||====================\n");
+					fprintf(store_run,"\t%s\t||",server_run);
 				}
-				fclose(store_run);
+	    	}
+	    	printf("149.\n");
 	    	return a;
-	    }	
-	    }		
+	    }			
 	}
 	if(strcmp(p,"RUN")==0){
 		// nhan nuoc co tu phia client
-		char stem[1024];
-		char *p;
-		int x, y, x1, y1;
-		strcpy(stem,recv_data);
-		int a = Check_Run(recv_data, conn_soc, chess, color);
-		if(a>0 && a!=2){
-			p = strtok(stem,"|");
-			p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/
-			x = atoi(p); 
-			p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/ 
-			y = atoi(p); 
-			p = strtok(NULL,"|");
-			x1 = atoi(p); /* lay toa do hang cua nuoc toi*/ 
-		    p = strtok(NULL,"|");
-		    y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
-		    if((store_run = fopen(file_name,"a+"))==NULL)
-		    {
-		      printf("**ERROR** Open file error.\n");
-			      return 0;
-		    }
-		    fprintf(store_run,"%c - %d|%d -> %d|%d\n",chess[x1][y1],x,y,x1,y1);
-		    fclose(store_run);
+		int a;
+		a = Check_Run(recv_data, conn_soc, chess, color, &server_run, &client_run, &flag);
+		if(flag == 1){
+			if(color == 1){
+				fprintf(store_run,"\t%s\t||\t%s\n",client_run,server_run);
+				printf("155\n");
+			}
+			else{
+				fprintf(store_run,"\t%s\n",client_run);
+				fprintf(store_run,"\t%s\t||",server_run);
+			}
 		}
-		return a;
 	}
+
 	if(strcmp(p,"END_RUN")==0){
 		// nhan duoc thong bao chiu thua tu phia client
-		return End_Game(conn_soc);
+		return End_Game(conn_soc,file_name);
 	}
+
 	if(strcmp(p,"RESULT")==0){
 		// nhan duoc thong bao chiu thua tu phia client
 		p = strtok(NULL,"|");
 		char stemp[1024];
-		//strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
-		 time_t rawtime; 
-	    // struct tm *timeinfo; 
-	    time(&rawtime); 
-	    // timeinfo = localtime(&rawtime); 
-	    strcpy(stemp,asctime(localtime(&rawtime)));
-
-	    if((store_run = fopen(file_name,"a+"))==NULL)
-		    {
-		      printf("**ERROR** Open file error.\n");
-			      return 0;
-		    }
-		    
+		strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
 		fprintf(store_run,"======================================\n");
 		fprintf(store_run,"End time: %s\n",stemp);
 		fprintf(store_run,"************************************\n");
@@ -279,7 +267,7 @@ void Clear(){
 }
 
 int main(){
-	srand(time(NULL));
+
 	if ((listen_sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 ){  /* calls socket() */
 		printf("socket() error\n");
 		exit(-1);
@@ -323,21 +311,18 @@ int main(){
 				}
 				else{
 					recv_data[bytes_received] = '\0';
-					printf("*** From Cllient: %s\n",recv_data);
+					printf("*** From Client: %s\n",recv_data);
 					if(Check_Mess(recv_data, conn_sock) <= 0){
 						close(conn_sock);
 						check_status=0;
 					}
 				}
 			}while(check_status>0);
-			fclose(store_run);
 			exit(0);
 		}
-		
-		status = unauthenticated;
-		play_status = not_play;
 		signal(SIGCHLD,sig_chld);
 		close(conn_sock);
+		//fclose(store_run);	
 	}
 	close(listen_sock);
 	return 1;
