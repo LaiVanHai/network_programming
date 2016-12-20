@@ -23,6 +23,7 @@
 UserType user; // luu thong tin cua user
 StatusType status = unauthenticated; // trang thai he thong
 PlayStatus play_status = not_play; // trang thai cua game
+ChessStatus chess_status;
 int data[9][9]; //  du lieu ban co
 char *username;
 char password[1024]; 
@@ -122,7 +123,10 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	    else{
 	    	fprintf(store_run,"Start time: %s",stemp2);
 	    	fprintf(store_run,"Your IP: %s\n",ip_address);
-	    	int a = Check_Color(recv_data, conn_soc, chess, &color);
+	    	int a = Check_Color(recv_data, conn_soc, chess, &color, &chess_status);
+	    	printf("-----------\n");
+	    	printf("%d %d %d %d\n",chess_status.status_rock_black1,chess_status.status_rock_black2,chess_status.status_rock_white1,chess_status.status_rock_white2);
+	    	printf("------------\n");
 	    	//if(color == 2) printf("124: %s\n",server_run);
 	    	if(a>0){
 	    		if(color == 1){
@@ -146,7 +150,10 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		char *p;
 		int x, y, x1, y1;
 		strcpy(stem,recv_data);
-		int a = Check_Run(recv_data, conn_soc, chess, color);
+		int a = Check_Run(recv_data, conn_soc, chess, color, &chess_status);
+		printf("-----------\n");
+    	printf("%d %d %d %d\n",chess_status.status_rock_black1,chess_status.status_rock_black2,chess_status.status_rock_white1,chess_status.status_rock_white2);
+    	printf("------------\n");
 		if(a>0 && a!=2){
 			p = strtok(stem,"|");
 			p = strtok(NULL,"|");/* lay toa do hang cua quan co chon*/
@@ -167,6 +174,11 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		}
 		return a;
 	}
+
+	if(strcmp(p,"UPGRADE_PAWN")==0){
+
+	}
+
 	if(strcmp(p,"END_RUN")==0){
 		// nhan duoc thong bao chiu thua tu phia client
 		return End_Game(conn_soc);

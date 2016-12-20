@@ -39,7 +39,7 @@ int Check_User(char str[1024], int conn_sock, char *username, UserType *user){ /
 	if(Find_User(username,&user1)==1)
 	{
 		username = p;
-		*user=user1;
+		*user = user1;
 		//send("LOGIN_USER_ID_OK");
 		//status = specified_id;/*chuyen qua trang thai xac nhan password */
 		bytes_sent = send(conn_sock,"LOGIN_USER_ID_OK",22,0);

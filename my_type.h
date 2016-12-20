@@ -25,6 +25,19 @@ typedef struct{
 	*/
 }RunType;
 
+typedef struct{
+	int king_x_white;
+	int king_y_white;
+	int king_x_black;
+	int king_y_black;
+	int status_king_black;
+	int status_king_white;
+	int status_rock_black1;
+	int status_rock_black2;
+	int status_rock_white1;
+	int status_rock_white2;
+}ChessStatus;
+
 typedef enum {
 	unauthenticated, /* trang thai khi bat dau ket noi voi client*/
 	specified_id,

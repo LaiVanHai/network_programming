@@ -3,17 +3,18 @@
 
 #include "time_machine.h"
 
-int Check_Color(char str[1024], int conn_sock, int **chess, int *color);/*Kiem tra su hop le ve mau quan co*/
-int Check_Run(char string[1024], int conn_sock, int **chess, int color);/*Kiem tra duong di quan co*/
+int Check_Color(char str[1024], int conn_sock, int **chess, int *color, ChessStatus *chess_status);/*Kiem tra su hop le ve mau quan co*/
+int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessStatus *chess_status);/*Kiem tra duong di quan co*/
 
 
-int Check_Color(char str2[1024], int conn_sock, int **chess, int *color){
+int Check_Color(char str2[1024], int conn_sock, int **chess, int *color, ChessStatus *chess_status){
 	char *p;
 	int number;
 	int x, x1, y, y1;
 	char buff[1024];
 	char buff2[1024];
 	char str[5];
+	ChessStatus chess_status2;
 
 	// if(status != authenticated || play_status != select_color){
 	// 	phai dang nhap moi choi game duoc
@@ -34,7 +35,9 @@ int Check_Color(char str2[1024], int conn_sock, int **chess, int *color){
 			// may se la nguoi danh truoc
 			*color = 2;
 			int **chess2 = chess;
-    		RunType run = find_way(chess2, *color); /* ai.h gui vao mang va mau quan co cua phia client*/
+			chess_status2 = *chess_status;
+    		RunType run = find_way(chess2, *color, &chess_status2); /* ai.h gui vao mang va mau quan co cua phia client*/
+    		*chess_status = chess_status2;
 			x = run.x;
 	    	sprintf(str, "%d", x);
 	    	/*chuyen so thanh xau*/
@@ -81,7 +84,7 @@ int Check_Color(char str2[1024], int conn_sock, int **chess, int *color){
 }
 
 
-int Check_Run(char string[1024], int conn_sock, int **chess, int color){
+int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessStatus *chess_status){
 	// color mau quan co ben client
 	char *p;
 	int x,x1; // toa do hang
@@ -89,6 +92,14 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 	char buff[1024];
 	char buff2[1024];
 	char str[5];
+	ChessStatus chess_status2;
+	int stempt; /*bien luu trang thai nuoc co duoc danh*/
+	/*
+	0: nuoc co loi
+	1: nuoc co binh thuong, 
+	2: nuoc co nhap thanh,
+	3: nuoc co phong tot*/
+
 	//RunType run;
 
 
@@ -127,23 +138,31 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color){
 			return 2;
 	}
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
+	chess_status2 = *chess_status;
+	stempt = check_chess_run(chess, color, x, y, x1 , y1, &chess_status2); /*quet trang thai nuoc co*/
 
-    if(check_chess_run(chess, color, x, y, x1 , y1)>0){ 
+    if(stempt > 0){ 
     	// check_run _ ai.h
     	//duong di cua phia client la hop le
     	chess[x1][y1] = chess[x][y];
     	chess[x][y]= '_';
     	/*cap nhat nuoc lai nuoc co*/
+
+    	*chess_status = chess_status2;
+    	/*cap nhat lai bien luu trang thai cac quan co neu co su thay doi*/
     	/*
     		AI: tinh toan duong di doi pho
     	*/
     	int **chess2 = chess;
-    	RunType run = find_way(chess2, color); /* ai.h gui vao mang va mau quan co cua phia client*/
+    	chess_status2 = *chess_status;
+
+    	RunType run = find_way(chess2, color, &chess_status2); /* ai.h gui vao mang va mau quan co cua phia client*/
 		x1 = run.x1;
 		y1 = run.y1;
 		x = run.x;
-		y = run.y;    	
-    	
+		y = run.y;
+
+    	*chess_status = chess_status2;
     	
     	if(run.status == 0){
     		//send("YOU_WIN"); // client thang
