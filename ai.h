@@ -10,7 +10,7 @@
 
 int check_color(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra su hop le ve mau*/
 int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *chess_status); /*Kiem tra duong di cua quan co*/
-RunType find_way(int **a, int color, ChessStatus *chess_status);/*Tim kiem duong di moi cho phia server*/
+RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling);/*Tim kiem duong di moi cho phia server*/
 
 
 int check_color(int **chess, int color, int x, int y, int x1, int y1){
@@ -48,7 +48,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	/*
 	return:
 	0: nuoc co khong hop le
-	1: nuoc co dung
+	1: nuoc co binh thuong
 	2: nuoc co nhap thanh
 	3: nuoc co phong tot
 	*/
@@ -216,7 +216,7 @@ int Random(int n)
 }
 
 
-RunType find_way(int **a, int color, ChessStatus *chess_status){
+RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling){
 	int color_server;
     int stempt;
 	int dd=0;
@@ -241,8 +241,9 @@ RunType find_way(int **a, int color, ChessStatus *chess_status){
         run_type.x2= run_type.x;
         chess_status2 = *chess_status;
 		dd = check_chess_run(a, color_server, run_type.x, run_type.y, run_type.x1, run_type.y1, &chess_status2);
-	}while(dd!=1);
+	}while(dd==0);
 
+	*check_castling = dd;
 	*chess_status = chess_status2;
 
 	run_type.status=1;

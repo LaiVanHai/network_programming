@@ -35,8 +35,9 @@ int Check_Color(char str2[1024], int conn_sock, int **chess, int *color, ChessSt
 			// may se la nguoi danh truoc
 			*color = 2;
 			int **chess2 = chess;
+			int check; 
 			chess_status2 = *chess_status;
-    		RunType run = find_way(chess2, *color, &chess_status2); /* ai.h gui vao mang va mau quan co cua phia client*/
+    		RunType run = find_way(chess2, *color, &chess_status2, &check); /* ai.h gui vao mang va mau quan co cua phia client*/
     		*chess_status = chess_status2;
 			x = run.x;
 	    	sprintf(str, "%d", x);
@@ -155,8 +156,9 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     	*/
     	int **chess2 = chess;
     	chess_status2 = *chess_status;
+    	int check_castling;
 
-    	RunType run = find_way(chess2, color, &chess_status2); /* ai.h gui vao mang va mau quan co cua phia client*/
+    	RunType run = find_way(chess2, color, &chess_status2, &check_castling); /* ai.h gui vao mang va mau quan co cua phia client*/
 		x1 = run.x1;
 		y1 = run.y1;
 		x = run.x;
