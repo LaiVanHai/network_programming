@@ -27,5 +27,6 @@ void server_run();/*nhan nuoc co tu phia server va xu ly*/
 void you_win();/*thong bao client da thang*/
 void computer_win();/*thong bao server da thang*/
 void run_error();/*xu ly khi nhap vao duong di khong hop le*/
+void update_castling_client(int x1, int y1); /* xu ly nhap thanh ben quan client*/
 
 #endif

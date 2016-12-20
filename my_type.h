@@ -32,10 +32,10 @@ typedef struct{
 	int king_y_black;
 	int status_king_black;
 	int status_king_white;
-	int status_rock_black1;
-	int status_rock_black2;
-	int status_rock_white1;
-	int status_rock_white2;
+	int status_rock_black1; /*trai*/
+	int status_rock_black2; /*phai*/
+	int status_rock_white1; /*trai*/
+	int status_rock_white2; /*phai*/
 }ChessStatus;
 
 typedef enum {

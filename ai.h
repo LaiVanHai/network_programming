@@ -140,6 +140,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	    	int test;
 	    	chess_status2 = *chess_status;
 		      if(x1 == x && (y1 == y-2 || y1 == y+2)) {
+		      	printf("VAo nhap thanh.\n");
 		      	int test_value = castling(chess,color,x,y,x1,y1,&chess_status2);
 		        if(test_value > 0)
 		          {
@@ -232,7 +233,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 
 	RunType run_type;
 
-	do{
+	while(dd<1){
        // printf(" 140 Server find way.\n");
 		run_type.x= Random(7);
 		run_type.y= Random(7);
@@ -241,7 +242,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
         run_type.x2= run_type.x;
         chess_status2 = *chess_status;
 		dd = check_chess_run(a, color_server, run_type.x, run_type.y, run_type.x1, run_type.y1, &chess_status2);
-	}while(dd==0);
+	}
 
 	*check_castling = dd;
 	*chess_status = chess_status2;

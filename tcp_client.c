@@ -1,6 +1,7 @@
-#include"interface.h"
-#include"my_type.h"
-#include"client.h"
+#include "interface.h"
+#include "my_type.h"
+#include "client.h"
+#include "update_castling.h" 
 int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
@@ -9,6 +10,7 @@ int *chess[9];
 int color=0;
 int first_run=1;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
+ChessStatus chess_status;/*dung de goi ham update_castling*/
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
   if(strcmp(buff,"HELLO")==0) /*Khoi tao*/
@@ -132,7 +134,7 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
         server_run(2); /*hien thi nuoc co cua phia server*/
         return 1;
       }
-      if(strcmp(p,"RUN_C")==0){ /*day la nuoc co ma truoc do client da yeu cau nhap thanh*/
+      if(strcmp(p,"RUN_C_CLIENT")==0){ /*day la nuoc co ma truoc do client da yeu cau nhap thanh*/
         server_run(3); /*hien thi nuoc co cua phia server*/
         return 1;
       }
@@ -142,6 +144,14 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       }
       if(strcmp(p,"RUN_U")==0){ /*day la nuoc co phong tot*/
         server_run(5); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+       if(strcmp(p,"RUN_C_SERVER")==0){ /*day la nuoc co nhap thanh ben server*/
+        server_run(6); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+      if(strcmp(p,"RUN_C_SERVER_CLIENT")==0){ /*day la nuoc co nhap thanh ben server*/
+        server_run(6); /*hien thi nuoc co cua phia server*/
         return 1;
       }
     }
@@ -380,7 +390,10 @@ void server_run(int warning){
     /*neu la nuoc co dau tien thi khong can cap nhap nuoc co truoc do*/
     first_run = 0;
   }
-  else
+  if(warning == 3){// di chuyen quan ma vao truoc
+    update_castling_client(run_demo.x1, run_demo.y1);
+  }
+
   {
    /*Cap nhat nuoc co ma client danh truoc do*/
     chess[x1][y1]=chess[x][y];
@@ -412,6 +425,11 @@ void server_run(int warning){
       select_warning();
       break;
     }
+    // case 3:
+    // {
+    //   update_castling_client(run_demo.x1, run_demo.y1);
+    //   break;
+    // }
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -491,6 +509,20 @@ void select_warning(){
     }
 
   }while(dd==0);
+}
+////////////////////////////////////////////////////////////////////////////////
+void update_castling_client(int x1_c, int y1_c){
+  /*cap nhat them nuoc co nhap thanh cua client*/
+  /*truyen vao vi tri cua quan vua hien tai*/
+  int x, y, x1, y1;
+  RunType r_type = update_castling(x1_c, y1_c, &chess_status);
+  x = r_type.x;
+  y = r_type.y;
+  x1 = r_type.x1;
+  y1 = r_type.y1;
+  chess[x1][y1] = chess[x][y];
+  chess[x][y]= '_';
+
 }
 ////////////////////////////////////////////////////////////////////////////////
 void you_win(){

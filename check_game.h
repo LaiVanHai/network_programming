@@ -2,6 +2,7 @@
 #define __CHECK_GAME__
 
 #include "time_machine.h"
+#include "update_castling.h"
 
 int Check_Color(char str[1024], int conn_sock, int **chess, int *color, ChessStatus *chess_status);/*Kiem tra su hop le ve mau quan co*/
 int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessStatus *chess_status);/*Kiem tra duong di quan co*/
@@ -141,13 +142,22 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
 	chess_status2 = *chess_status;
 	stempt = check_chess_run(chess, color, x, y, x1 , y1, &chess_status2); /*quet trang thai nuoc co*/
-
+	printf("Gia tri stempt: %d\n ",stempt);
     if(stempt > 0){ 
     	// check_run _ ai.h
     	//duong di cua phia client la hop le
     	chess[x1][y1] = chess[x][y];
     	chess[x][y]= '_';
     	/*cap nhat nuoc lai nuoc co*/
+    	if(stempt > 20){
+    		RunType r_type = update_castling(x1, y1, &chess_status2);
+    		x = r_type.x;
+    		y = r_type.y;
+    		x1 = r_type.x1;
+    		y1 = r_type.y1;
+    		chess[x1][y1] = chess[x][y];
+    		chess[x][y]= '_';
+    	}
 
     	*chess_status = chess_status2;
     	/*cap nhat lai bien luu trang thai cac quan co neu co su thay doi*/
@@ -159,6 +169,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     	int check_castling;
 
     	RunType run = find_way(chess2, color, &chess_status2, &check_castling); /* ai.h gui vao mang va mau quan co cua phia client*/
+    	/*Bien check_castling: la bien the hien trang thai co phai nuoc co nhap thanh hay khong*/
 		x1 = run.x1;
 		y1 = run.y1;
 		x = run.x;
@@ -197,15 +208,38 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
 	    	chess[x1][y1] = chess[x][y];
     		chess[x][y]= '_';
 
+
     		/*hien thi ban co sau khi cap nhat nuoc co cua client va server*/
     		paint(chess,color);
 	    	
 	    	if(run.status == 1)
 	    	{
 	    		//send("RUN|chess|x|y"); // neu day la nuoc co binh thuong
-	    		strcpy(buff2,"RUN|");
-	    		strcat(buff2,buff);
-	    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+				if(check_castling > 20 && stempt > 20){
+				/*Truong hop ca client va server deu nhap thanh*/
+    			/*Day la nuoc co nhap thanh ben server*/
+    				strcpy(buff2,"RUN_C_SERVER_CLIENT|");
+		    		strcat(buff2,buff);
+		    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+					return Check_Send(bytes_sent);
+    			}
+    			else{
+    				if(check_castling > 20){
+						strcpy(buff2,"RUN_C_SERVER|"); /*day la nuoc co nhap thanh cua server*/
+		    			strcat(buff2,buff);
+    				}
+    				else
+    				if(stempt > 20){
+    					strcpy(buff2,"RUN_C_CLIENT|"); /*day la nuoc co nhap thanh cua client*/
+		    			strcat(buff2,buff);
+    				}
+    				else
+    				{ /*truyen di mot nuoc co thong thuong*/
+    					strcpy(buff2,"RUN|");
+	    				strcat(buff2,buff);
+    				}
+    			}
+    			bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
 				return Check_Send(bytes_sent);
 	    	}
 	    	if(run.status == 2)
