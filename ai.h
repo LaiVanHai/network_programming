@@ -94,10 +94,10 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	      chess_status2 = *chess_status;
 
 		  int test = check_rock(chess,color,x,y,x1,y1);
-	      if(test == 1 && y == 0){
+	      if(test == 1 && y == 0 && x == 0){
 	        	chess_status2.status_rock_black1 = 1;
 	      }
-	      else if(test == 1 && y == 7){
+	      else if(test == 1 && y == 7 && x == 0){
 	      		chess_status2.status_rock_black2 = 1;
 	      }
 
@@ -109,10 +109,10 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	      chess_status2 = *chess_status;
 
 	      int test = check_rock(chess,color,x,y,x1,y1);
-	      if(test == 1 && y == 0){
+	      if(test == 1 && y == 0 && x == 7){
 	        	chess_status2.status_rock_white1 = 1;
 	      }
-	      else if(test == 1 && y == 7){
+	      else if(test == 1 && y == 7 && x == 7){
 	      		chess_status2.status_rock_white2 = 1;
 	      }
 
@@ -140,14 +140,16 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	    	int test;
 	    	chess_status2 = *chess_status;
 		      if(x1 == x && (y1 == y-2 || y1 == y+2)) {
-		        if(castling(chess,color,x,y,x1,y1,&chess_status2)==1)
+		      	int test_value = castling(chess,color,x,y,x1,y1,&chess_status2);
+		        if(test_value > 0)
 		          {
 		          	chess_status2.king_x_black = x1;
 		      		chess_status2.king_y_black = y1;
 		      		chess_status2.status_king_black = 1;
 
 		          	*chess_status = chess_status2;
-		          	return 2; /*xu ly ma nhap thanh*/
+
+		          	return test_value; /*xu ly ma nhap thanh*/
 		          }
 		         else{
 		         	return 0;
@@ -175,18 +177,19 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	    	chess_status2 = *chess_status;
 	    	
 		      if(x1 == x && (y1 == y-2 || y1 == y+2)) {
-		     if(castling(chess,color,x,y,x1,y1,&chess_status2)==1)
-		          {
-		          	chess_status2.king_x_white = x1;
-		      		chess_status2.king_y_white = y1;
-		      		chess_status2.status_king_white = 1;
+		      	 int test_value = castling(chess,color,x,y,x1,y1,&chess_status2);
+			     if(test_value > 0)
+			          {
+			          	chess_status2.king_x_white = x1;
+			      		chess_status2.king_y_white = y1;
+			      		chess_status2.status_king_white = 1;
 
-		          	*chess_status = chess_status2;
-		          	return 2; /*xu ly ma nhap thanh*/
-		          }
-		         else{
-		         	return 0;
-		         }
+			          	*chess_status = chess_status2;
+			          	return test_value; /*xu ly ma nhap thanh*/
+			          }
+			         else{
+			         	return 0;
+			         }
   		      }
 		      else
 		      { 

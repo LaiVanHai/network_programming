@@ -365,31 +365,31 @@ int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *
           /*kiem tra su di chuyen cua quan xe va quan tuong co bi chieu tuong hay khong*/
           // chess[7][0] = '_';
           // chess[7][3] = 'X'; //xu ly nuoc co nay ben phia client
-          return 1;
+          return 24; /*Nhap thanh goc phan tu thu 4*/
         }
       }
       else if(y1 == y+2 && chess[7][7] == 'X' && chess_status2.status_rock_white2 == 0){
         if(check_rock(chess,color,7,7,7,5) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           // chess[7][7] = '_';
           // chess[7][5] = 'X'; //xu ly nuoc co nay ben phia client
-          return 1;
+          return 23; /*Nhap thanh goc phan tu thu 3*/
         }
       }
       return 0;
     }
     else if(color == 1 && chess_status2.status_king_black == 0){
       if(y1 == y-2 && chess[0][0] == 'x' && chess_status2.status_rock_black1 == 0){
-        if(check_rock(chess,color,0,0,0,3) == 1 && check_checkmate(chess,color,x1,y1) != 1){
+        if(check_rock(chess,color,0,0,0,2) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           // chess[0][0] = '_';
           // chess[0][3] = 'x';
-          return 1;
+          return 21; /*Nhap thanh goc phan tu thu 1*/
         }
       }
       else if(y1 == y+2 && chess[0][7] == 'x' && chess_status2.status_rock_black2 == 0){
-        if(check_rock(chess,color,0,7,0,5) == 1 && check_checkmate(chess,color,x1,y1) != 1){
+        if(check_rock(chess,color,0,7,0,4) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           // chess[0][7] = '_';
           // chess[0][5] = 'x';
-          return 1;
+          return 22; /*Nhap thanh goc phan tu thu 2*/
         }
       }
       else return 0;

@@ -34,7 +34,7 @@ void make_chess(int **chess)
   chess[0][0]='x';chess[7][0]='X';chess[0][7]='x';chess[7][7]='X';
   chess[0][1]='m';chess[7][1]='M';chess[0][6]='m';chess[7][6]='M';
   chess[0][2]='t';chess[7][2]='T';chess[0][5]='t';chess[7][5]='T';
-  chess[0][3]='w';chess[0][4]='h';
+  chess[0][3]='h';chess[0][4]='w';
   chess[7][3]='H';chess[7][4]='W';
   
 }

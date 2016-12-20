@@ -128,6 +128,22 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
         server_run(1); /*hien thi nuoc co cua phia server*/
         return 1;
       }
+      if(strcmp(p,"RUN_C_W")==0){ /*day la nuoc co sau khi nhap thanh thi se bi chieu tuong*/
+        server_run(2); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+      if(strcmp(p,"RUN_C")==0){ /*day la nuoc co ma truoc do client da yeu cau nhap thanh*/
+        server_run(3); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+      if(strcmp(p,"RUN_U_W")==0){ /*day la nuoc co sau khi phong tot thi se bi chieu tuong*/
+        server_run(4); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
+      if(strcmp(p,"RUN_U")==0){ /*day la nuoc co phong tot*/
+        server_run(5); /*hien thi nuoc co cua phia server*/
+        return 1;
+      }
     }
 
     if(strcmp(buff, "RUN_ERROR") == 0) /*Duong di phia client nhap bi loi*/
@@ -384,13 +400,18 @@ void server_run(int warning){
   chess[x1][y1]=chess[x][y];
   chess[x][y]='_';
   paint(chess,color);
-  if(warning == 0)
-  {
-    select_run();
-  }
-  else
-  {
-    select_warning();
+
+  switch(warning){
+    case 0:
+    {
+      select_run();
+      break;
+    }
+    case 1:
+    {
+      select_warning();
+      break;
+    }
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
