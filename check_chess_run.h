@@ -359,7 +359,7 @@ int check_checkmate(int **chess, int color,  int x, int y){
 int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *chess_status){
   ChessStatus chess_status2;
   chess_status2 = *chess_status;
-    if(color == 1 && chess_status2.status_king_white ==0){
+    if(color == 1 && chess_status2.status_king_white == 0){
       if(y1 == y-2 && chess[7][0] == 'X' && chess_status2.status_rock_white1 == 0){
         if(check_rock(chess,color,7,0,7,3) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           /*kiem tra su di chuyen cua quan xe va quan tuong co bi chieu tuong hay khong*/
@@ -377,16 +377,16 @@ int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *
       }
       return 0;
     }
-    else if(color == 1 && chess_status2.status_king_black == 0){
+    else if(color == 2 && chess_status2.status_king_black == 0){
       if(y1 == y-2 && chess[0][0] == 'x' && chess_status2.status_rock_black1 == 0){
-        if(check_rock(chess,color,0,0,0,2) == 1 && check_checkmate(chess,color,x1,y1) != 1){
+        if(check_rock(chess,color,0,0,0,3) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           // chess[0][0] = '_';
           // chess[0][3] = 'x';
           return 21; /*Nhap thanh goc phan tu thu 1*/
         }
       }
       else if(y1 == y+2 && chess[0][7] == 'x' && chess_status2.status_rock_black2 == 0){
-        if(check_rock(chess,color,0,7,0,4) == 1 && check_checkmate(chess,color,x1,y1) != 1){
+        if(check_rock(chess,color,0,7,0,5) == 1 && check_checkmate(chess,color,x1,y1) != 1){
           // chess[0][7] = '_';
           // chess[0][5] = 'x';
           return 22; /*Nhap thanh goc phan tu thu 2*/

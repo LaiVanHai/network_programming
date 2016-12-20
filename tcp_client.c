@@ -118,40 +118,47 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
       return 1;
     }    
     if(buff[strlen(buff)-1]=='|'){
+      /*server run: tham so truyen vao dau tien: 1- nuoc co binh thuong, 2- nuoc co chieu tuong*/
+      /*tham so thu 2: yeu cau thuc hien ngoai le:
+      + 0: binh thuong
+      + 20: nhap thanh ben client
+      + 21: nhap thanh ben server
+      + 22: nhap thanh ca ben server lan client 
+      + 3: phong tot*/
       char str[1024];
       char *p;
       strcpy(str, buff);
       p = strtok(str,"|");
       if(strcmp(p,"RUN")==0){ /*day la nuoc co binh thuong ma server gui den*/
-        server_run(0); /*hien thi nuoc co cua phia server*/
+        server_run(1, 0); /*hien thi nuoc co cua phia server*/
         return 1;
       }
       if(strcmp(p,"RUN_W")==0){ /*day la nuoc co chieu tuong ma server gui den*/
-        server_run(1); /*hien thi nuoc co cua phia server*/
+        server_run(2, 0); /*hien thi nuoc co cua phia server*/
         return 1;
       }
       if(strcmp(p,"RUN_C_W")==0){ /*day la nuoc co sau khi nhap thanh thi se bi chieu tuong*/
-        server_run(2); /*hien thi nuoc co cua phia server*/
+        server_run(2, 2); /*hien thi nuoc co cua phia server*/
         return 1;
       }
       if(strcmp(p,"RUN_C_CLIENT")==0){ /*day la nuoc co ma truoc do client da yeu cau nhap thanh*/
-        server_run(3); /*hien thi nuoc co cua phia server*/
+        server_run(1, 20); /*hien thi nuoc co cua phia server*/
         return 1;
       }
       if(strcmp(p,"RUN_U_W")==0){ /*day la nuoc co sau khi phong tot thi se bi chieu tuong*/
-        server_run(4); /*hien thi nuoc co cua phia server*/
+        server_run(2, 3); /*hien thi nuoc co cua phia server*/
         return 1;
       }
       if(strcmp(p,"RUN_U")==0){ /*day la nuoc co phong tot*/
-        server_run(5); /*hien thi nuoc co cua phia server*/
+        server_run(1, 3); /*hien thi nuoc co cua phia server*/
         return 1;
       }
        if(strcmp(p,"RUN_C_SERVER")==0){ /*day la nuoc co nhap thanh ben server*/
-        server_run(6); /*hien thi nuoc co cua phia server*/
+        server_run(1, 21); /*hien thi nuoc co cua phia server*/
         return 1;
       }
-      if(strcmp(p,"RUN_C_SERVER_CLIENT")==0){ /*day la nuoc co nhap thanh ben server*/
-        server_run(6); /*hien thi nuoc co cua phia server*/
+      if(strcmp(p,"RUN_C_SERVER_CLIENT")==0){ /*day la nuoc co nhap thanh ca ben server va client*/
+        server_run(1, 22); /*hien thi nuoc co cua phia server*/
         return 1;
       }
     }
@@ -376,7 +383,7 @@ void game_ready(){
   }while(dd==0);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void server_run(int warning){
+void server_run(int warning, int current){
   /* warning = 0 nuoc co binh thuong
     warning = 1  nuoc co chieu tuong
   */
@@ -389,16 +396,13 @@ void server_run(int warning){
   if(first_run==1){
     /*neu la nuoc co dau tien thi khong can cap nhap nuoc co truoc do*/
     first_run = 0;
-  }
-  if(warning == 3){// di chuyen quan ma vao truoc
-    update_castling_client(run_demo.x1, run_demo.y1);
-  }
-
+  }else
   {
    /*Cap nhat nuoc co ma client danh truoc do*/
     chess[x1][y1]=chess[x][y];
     chess[x][y]='_';
   }
+
   
   p = strtok(buff,"|");
   p = strtok(NULL,"|");
@@ -412,24 +416,53 @@ void server_run(int warning){
   /*cap nhat nuoc co ma server danh tra*/
   chess[x1][y1]=chess[x][y];
   chess[x][y]='_';
-  paint(chess,color);
 
+ /*tham so current: yeu cau thuc hien ngoai le:
+      + 0: binh thuong
+      + 20: nhap thanh ben client
+      + 21: nhap thanh ben server
+      + 22: nhap thanh ca ben server lan client 
+      + 3: phong tot*/
+
+
+  switch(current){
+    case 20:
+    {
+      update_castling_client(run_demo.x1, run_demo.y1);
+      break;
+    }
+    case 21:
+    {
+      update_castling_client(x1,y1);
+      break;
+    }
+    case 22:
+    {
+      update_castling_client(run_demo.x1, run_demo.y1);
+      update_castling_client(x1,y1);
+      break;
+    }
+  }
+
+
+  paint(chess,color);
+ 
   switch(warning){
-    case 0:
+    case 1:
     {
       select_run();
       break;
     }
-    case 1:
+    case 2:
     {
       select_warning();
       break;
     }
-    // case 3:
-    // {
-    //   update_castling_client(run_demo.x1, run_demo.y1);
-    //   break;
-    // }
+    case 3:
+    {
+      update_castling_client(run_demo.x1, run_demo.y1);
+      break;
+    }
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -520,6 +553,7 @@ void update_castling_client(int x1_c, int y1_c){
   y = r_type.y;
   x1 = r_type.x1;
   y1 = r_type.y1;
+  printf("%d %d %d %d\n", x, y, x1 ,y1);
   chess[x1][y1] = chess[x][y];
   chess[x][y]= '_';
 

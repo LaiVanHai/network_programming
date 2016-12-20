@@ -88,6 +88,9 @@ int Check_Color(char str2[1024], int conn_sock, int **chess, int *color, ChessSt
 
 int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessStatus *chess_status){
 	// color mau quan co ben client
+	/*return 1: nuoc co hop le, 
+	2: nuoc co bi loi
+	3: nuoc co nhap thanh*/
 	char *p;
 	int x,x1; // toa do hang
 	int y,y1; // toa do cot
@@ -96,11 +99,6 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
 	char str[5];
 	ChessStatus chess_status2;
 	int stempt; /*bien luu trang thai nuoc co duoc danh*/
-	/*
-	0: nuoc co loi
-	1: nuoc co binh thuong, 
-	2: nuoc co nhap thanh,
-	3: nuoc co phong tot*/
 
 	//RunType run;
 
@@ -221,26 +219,35 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     				strcpy(buff2,"RUN_C_SERVER_CLIENT|");
 		    		strcat(buff2,buff);
 		    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-					return Check_Send(bytes_sent);
+					if(Check_Send(bytes_sent)>0){
+						return 3;
+					}
     			}
     			else{
     				if(check_castling > 20){
 						strcpy(buff2,"RUN_C_SERVER|"); /*day la nuoc co nhap thanh cua server*/
 		    			strcat(buff2,buff);
+		    			bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+						return Check_Send(bytes_sent);
     				}
     				else
     				if(stempt > 20){
     					strcpy(buff2,"RUN_C_CLIENT|"); /*day la nuoc co nhap thanh cua client*/
 		    			strcat(buff2,buff);
+		    			bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+						if(Check_Send(bytes_sent)>0){
+							return 3;
+						}
     				}
     				else
     				{ /*truyen di mot nuoc co thong thuong*/
     					strcpy(buff2,"RUN|");
 	    				strcat(buff2,buff);
+	    				bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+						return Check_Send(bytes_sent);
     				}
     			}
-    			bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-				return Check_Send(bytes_sent);
+    			
 	    	}
 	    	if(run.status == 2)
 	    	{

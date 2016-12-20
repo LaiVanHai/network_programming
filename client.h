@@ -23,7 +23,7 @@ void exit_program();/*xu ly thoat chuong trinh*/
 void game_ready();/*xu ly chon mau quan co*/
 void select_run();/*nhap duong di thong thuong*/
 void select_warning();/*xu ly khi nhan duoc nuoc co chieu tuong*/
-void server_run();/*nhan nuoc co tu phia server va xu ly*/
+void server_run(int warning, int current);/*nhan nuoc co tu phia server va xu ly*/
 void you_win();/*thong bao client da thang*/
 void computer_win();/*thong bao server da thang*/
 void run_error();/*xu ly khi nhap vao duong di khong hop le*/
