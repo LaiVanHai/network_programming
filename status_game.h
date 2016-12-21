@@ -26,9 +26,35 @@ int End_Game(int conn_sock){
 	***************************/
 }
 
-int Send_Result(int conn_sock){
+int Send_Result(int conn_sock, char file_name[1024]){
 	/*Thao tac gui file ve phia client*/
-	return 1;
+	FILE *f1;
+	char recv_data[1024];
+	
+	 if((f1=fopen(file_name,"r+"))==NULL)
+	{
+ 	 printf("open file_server error!!!\n");
+		}
+		else
+		{
+			char s[1024];
+			int i;
+			while(fgets(s,1024,f1)!=NULL)
+			{
+				char str[1024];
+				strcpy(str,"FILE_LOG|");
+				strcat(str,s);
+				strcat(str,"|");
+				int bytes_sent = send(conn_sock,str,strlen(str),0); 
+				int	bytes_received = recv(conn_sock,recv_data,1024,0);//nhan du lieu tu client gui toi
+				if (bytes_received < 0){
+						printf("\nError!Can not receive data from client!");
+						close(conn_sock);
+					}
+			}
+			bytes_sent = send(conn_sock,"EXIT_FILE_LOG",22,0); 
+			return 1;
+		}
 }
 
 #endif

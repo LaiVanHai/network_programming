@@ -28,5 +28,7 @@ void you_win();/*thong bao client da thang*/
 void computer_win();/*thong bao server da thang*/
 void run_error();/*xu ly khi nhap vao duong di khong hop le*/
 void update_castling_client(int x1, int y1); /* xu ly nhap thanh ben quan client*/
+void make_file_log();/*tao file luu tru thong tin tran dau*/
+int printf_log(char str[1024]);/*luu thong tin file log*/
 
 #endif

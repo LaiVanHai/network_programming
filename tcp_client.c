@@ -2,6 +2,7 @@
 #include "my_type.h"
 #include "client.h"
 #include "update_castling.h" 
+#include "time_machine.h"
 int client_sock;
 char buff[1024];
 struct sockaddr_in server_addr;
@@ -11,6 +12,8 @@ int color=0;
 int first_run=1;
 RunType run_demo; /*bien luu su di chuyen cua quan co*/
 ChessStatus chess_status;/*dung de goi ham update_castling*/
+char filename[1014];
+FILE *store_log;
 int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
 {
   if(strcmp(buff,"HELLO")==0) /*Khoi tao*/
@@ -161,6 +164,9 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
         server_run(1, 22); /*hien thi nuoc co cua phia server*/
         return 1;
       }
+      if(strcmp(p,"FILE_LOG")==0){ /*luu thong tin tran dau vao file log*/
+        return printf_log(buff);
+      }
     }
 
     if(strcmp(buff, "RUN_ERROR") == 0) /*Duong di phia client nhap bi loi*/
@@ -184,6 +190,11 @@ int check_buff(char buff[80]) /* Kiem tra tin hieu ket thuc tu phia server*/
     {
       exit_program();
       return 0;
+    }
+    if(strcmp(buff, "EXIT_FILE_LOG") == 0) /*Huy ket noi thanh cong*/
+    {
+      authenticated_menu();
+      return 1;
     }
 
   return 0;
@@ -458,11 +469,6 @@ void server_run(int warning, int current){
       select_warning();
       break;
     }
-    case 3:
-    {
-      update_castling_client(run_demo.x1, run_demo.y1);
-      break;
-    }
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -522,13 +528,13 @@ void select_warning(){
     printf("=>>You enter into the selection:");
     scanf("%d",&choice);
     switch(choice){
-      case 1:
+      case 2:
       {
         strcpy(buff,"END_RUN");
         dd=1;
         break;
       }
-      case 2:
+      case 1:
       {
         select_run();
         dd=1;
@@ -564,6 +570,7 @@ void you_win(){
   printf("************* YOU_WIN **************\n");
   printf("************************************\n");
   strcpy(buff,"RESULT|1|"); /*Yeu cau nhan file ket qua tu phai server*/
+  make_file_log();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void computer_win(){
@@ -571,6 +578,40 @@ void computer_win(){
   printf("********** COMPUTER_WIN ************\n");
   printf("************************************\n");
   strcpy(buff,"RESULT|2|"); /*Yeu cau nhan file ket qua tu phai server*/
+  make_file_log();
+}
+////////////////////////////////////////////////////////////////////////////////
+int printf_log(char str[1024]){
+  char str2[1024];
+  char *p;
+  if((store_log = fopen(filename,"a+"))==NULL)
+    {
+      printf("**ERROR** Open file error.\n");
+        return 0;
+    }
+    else{
+      strcpy(str2,str);
+      p = strtok(str2,"|");
+      p = strtok(NULL,"|");
+      fprintf(store_log,"%s",p);
+    }
+    fclose(store_log);
+    return 1;
+
+}
+////////////////////////////////////////////////////////////////////////////////
+void make_file_log(){
+   char stemp[1024];
+  char stemp2[1024];
+    //strcpy(stemp,scan_time()); /*lay thoi gian he thong*/
+  char *p;
+  time_t rawtime; 
+  // struct tm *timeinfo; 
+  time(&rawtime); 
+  // timeinfo = localtime(&rawtime); 
+  strcpy(stemp,asctime(localtime(&rawtime)));
+  strcpy(stemp2,stemp);
+  strcpy(filename,make_name_file(stemp,1)); /*Tao file luu thong tin tran dau*/
 }
 ////////////////////////////////////////////////////////////////////////////////
 int main(){

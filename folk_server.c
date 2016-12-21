@@ -118,7 +118,7 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 	    // timeinfo = localtime(&rawtime); 
 	    strcpy(stemp,asctime(localtime(&rawtime)));
 		strcpy(stemp2,stemp);
-		strcpy(file_name,make_name_file(stemp)); /*Tao file luu thong tin tran dau*/
+		strcpy(file_name,make_name_file(stemp,0)); /*Tao file luu thong tin tran dau*/
 		if((store_run = fopen(file_name,"w+"))==NULL)
 		    {
 		      printf("**ERROR** Open file error.\n");
@@ -219,7 +219,7 @@ int Check_Mess(char recv_data[1024], int conn_soc){
   			fprintf(store_run,"************************************\n");
 		}
 		fclose(store_run);
-		return Send_Result(conn_soc);
+		return Send_Result(conn_soc,file_name);
 	}
 
 	if(strcmp(p,"EXIT")==0){
