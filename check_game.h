@@ -38,7 +38,8 @@ int Check_Color(char str2[1024], int conn_sock, int **chess, int *color, ChessSt
 			int **chess2 = chess;
 			int check; 
 			chess_status2 = *chess_status;
-    		RunType run = find_way(chess2, *color, &chess_status2, &check); /* ai.h gui vao mang va mau quan co cua phia client*/
+    		RunType run = find_way(chess2, *color, &chess_status2, &check, 0); /* ai.h gui vao mang va mau quan co cua phia client*/
+    		/*Gia tri 0 phan anh quan tuong ben server co bi chieu hay khong*/
     		*chess_status = chess_status2;
 			x = run.x;
 	    	sprintf(str, "%d", x);
@@ -99,6 +100,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
 	char str[5];
 	ChessStatus chess_status2;
 	int stempt; /*bien luu trang thai nuoc co duoc danh*/
+	int server_warning = 0; /*canh bao nuoc co chieu tuong ben server*/
 
 	//RunType run;
 
@@ -157,6 +159,14 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     		chess[x][y]= '_';
     	}
 
+    	int checkmate_status =  check_checkmate_reverse(chess, color, &chess_status2);
+    	if(checkmate_status == 444){
+    		/*Day la nuoc co chieu tuong ben client*/
+    		server_warning = 1;
+    	}
+
+    	printf("server_warning : %d\n",server_warning);
+
     	*chess_status = chess_status2;
     	/*cap nhat lai bien luu trang thai cac quan co neu co su thay doi*/
     	/*
@@ -166,7 +176,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     	chess_status2 = *chess_status;
     	int check_castling;
 
-    	RunType run = find_way(chess2, color, &chess_status2, &check_castling); /* ai.h gui vao mang va mau quan co cua phia client*/
+    	RunType run = find_way(chess2, color, &chess_status2, &check_castling, server_warning); /* ai.h gui vao mang va mau quan co cua phia client*/
     	/*Bien check_castling: la bien the hien trang thai co phai nuoc co nhap thanh hay khong*/
 		x1 = run.x1;
 		y1 = run.y1;

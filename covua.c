@@ -338,6 +338,7 @@ int check_queen(int chess[8][8], int color, int x, int y, int x1, int y1){
    - Hàm trả về 1 nếu nước đi của quân tướng là đúng, trả về 0 nếu nước đi là sai.
 */
 int check_king(int chess[8][8], int color, int x, int y, int x1, int y1){
+  /*kiem tra xem da het co hay chua*/
   //kiểm tra 8 ô liền kề
   if(y1 == y-1 || y1 == y || y1 == y+1) {
     if(x1 == x-1 || x1 == x || x1 == x+1) {

@@ -100,6 +100,10 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		for(int i = 0; i < 9; i++)
    	    chess[i] = (int*)malloc(9*sizeof(int));
    		make_chess(chess);
+   		chess_status.king_x_white = 7;
+   		chess_status.king_y_white = 4;
+   		chess_status.king_x_black = 0;
+   		chess_status.king_y_black = 4;
 		return Start_Game(conn_soc);
 	}
 	if(strcmp(p,"COLOR")==0){
@@ -170,6 +174,8 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 			      return 0;
 		    }
 		    fprintf(store_run,"%c - %d|%d -> %d|%d\n",chess[x1][y1],x,y,x1,y1);
+
+
 		    fclose(store_run);
 		}
 		return a;

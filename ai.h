@@ -10,7 +10,8 @@
 
 int check_color(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra su hop le ve mau*/
 int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *chess_status); /*Kiem tra duong di cua quan co*/
-RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling);/*Tim kiem duong di moi cho phia server*/
+RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling, int server_warning);
+/*Tim kiem duong di moi cho phia server*/
 
 
 int check_color(int **chess, int color, int x, int y, int x1, int y1){
@@ -51,6 +52,7 @@ int check_chess_run(int **chess, int color, int x, int y, int x1, int y1, ChessS
 	1: nuoc co binh thuong
 	2: nuoc co nhap thanh
 	3: nuoc co phong tot
+	4: neu la nuoc co chieu tuong
 	*/
 	ChessStatus chess_status2;
 	int value; /*ket qua lua chon quan co*/
@@ -217,11 +219,27 @@ int Random(int n)
 }
 
 
-RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling){
+RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castling, int server_warning){
 	int color_server;
     int stempt;
 	int dd=0;
 	ChessStatus chess_status2;
+	int king_x_white;
+	int king_y_white;
+	int king_x_black;
+	int king_y_black;
+
+	chess_status2 = *chess_status;
+
+	king_x_black = chess_status2.king_x_black;
+	king_y_black = chess_status2.king_y_black;
+	king_x_white = chess_status2.king_x_white;
+	king_y_white = chess_status2.king_y_white;
+
+	//printf("toa do quan tuong 2 ben la: %d %d %d %d\n",king_x_white,king_y_white,king_x_black,king_y_black);
+
+
+
 	if(color==1)
 	{
 		color_server = 2;
@@ -230,9 +248,39 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 	{
 		color_server = 1;
 	}
-
 	RunType run_type;
 
+	if(server_warning == 1){
+		for(int i=0;i<=7;i++){
+			for(int j=0;j<=7;j++){
+				for(int i1=0;i1<=7;i1++){
+					for(int j1=0;j1<=7;j1++){
+						if(check_chess_run(a,color_server, i, j, i1, j1,&chess_status2)>=1){
+							if(color_server == 1){
+								if(check_checkmate(a,color_server, king_x_white, king_y_white)==0){
+									server_warning = 0;
+									run_type.x = i;
+									run_type.y = j;
+									run_type.x1 = i1;
+									run_type.y1 = j1;
+								}
+							}
+							else{
+								if(check_checkmate(a,color_server, king_x_black, king_y_black)==0){
+									server_warning = 0;
+									run_type.x = i;
+									run_type.y = j;
+									run_type.x1 = i1;
+									run_type.y1 = j1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else
 	while(dd<1){
        // printf(" 140 Server find way.\n");
 		run_type.x= Random(7);
@@ -240,14 +288,25 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 		run_type.x1= Random(7);
 		run_type.y1= Random(7);
         run_type.x2= run_type.x;
-        chess_status2 = *chess_status;
 		dd = check_chess_run(a, color_server, run_type.x, run_type.y, run_type.x1, run_type.y1, &chess_status2);
 	}
 
 	*check_castling = dd;
 	*chess_status = chess_status2;
-
-	run_type.status=1;
+	if(server_warning == 0)
+	{
+		/*Da khac che duoc nuoc chieu tuong hoac khong con bi chieu tuong nua*/
+    	int checkmate_status =  check_checkmate_reverse(a, color, &chess_status2);
+    	if(checkmate_status == 444){
+    		/*Day la nuoc co chieu tuong ben client*/
+    		run_type.status = 2; /*Day la nuoc co chieu tuong ben server gui ve client*/
+    	}
+    	else
+		run_type.status = 1; /*nuoc co binh thuong*/
+	}else
+	{
+		run_type.status = 0;/*Server khong tim duoc nuoc co khac che*/
+	}
 	return run_type;
 }
 #endif

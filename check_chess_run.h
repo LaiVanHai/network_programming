@@ -11,6 +11,8 @@ int check_bishop(int **chess, int color, int x, int y, int x1, int y1);/*kiem tr
 int check_queen(int **chess, int color, int x, int y, int x1, int y1);/*kiem tra quan hau*/
 int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *chess_status);/*nhap thanh*/
 int check_checkmate(int **chess, int color,  int x, int y); /*ham kiem tra chieu tuong*/
+int check_checkmate_reverse(int **chess, int color, ChessStatus *chess_status); /*Kiem tra xem nuoc co cua minh co chieu 
+tuong doi phuong khong*/
 
 
 int check_knight(int **chess, int color, int x, int y, int x1, int y1){
@@ -49,6 +51,7 @@ int check_knight(int **chess, int color, int x, int y, int x1, int y1){
     }
   }
 }
+
 
 /***********************************************************************/
 /* - Hàm kiểm tra các nước đi của quân tốt.
@@ -299,7 +302,8 @@ int check_queen(int **chess, int color, int x, int y, int x1, int y1){
 }
 
 /************************************************************************/
-int check_checkmate(int **chess, int color,  int x, int y){
+int check_checkmate(int **chess, int color, int x, int y){
+  /*Kiem tra xem quan tuong ben minh co bi chieu hay khong*/
   int i, j;
   for(i=0 ;i<=7 ;i++){
     for(j=0 ; j<=7 ;j++){
@@ -352,6 +356,47 @@ int check_checkmate(int **chess, int color,  int x, int y){
         }
       }
     }
+  }
+  return 0; /*quan tuong khong bi chieu*/
+}
+/************************************************************************/
+
+int check_checkmate_reverse(int **chess, int color, ChessStatus *chess_status)
+{
+  /*Kiem tra xem nuoc co ben minh co chieu tuon ben doi phuong hay khong*/
+  int king_x_white;
+  int king_y_white;
+  int king_x_black;
+  int king_y_black;
+  ChessStatus chess_status2;
+
+  chess_status2 = *chess_status;
+
+  king_x_black = chess_status2.king_x_black;
+  king_y_black = chess_status2.king_y_black;
+  king_x_white = chess_status2.king_x_white;
+  king_y_white = chess_status2.king_y_white;
+
+  if(color == 1){
+    /*kiem tra xem co chieu tuong quan den khong*/
+      if(check_checkmate(chess, 2, king_x_black, king_y_black)>0){
+        return 444;
+        /*Day la nuoc co chieu tuong*/
+      }
+      else
+      {
+        return 0; 
+      }
+  }else{
+       /*kiem tra xem co chieu tuong quan trang khong*/
+      if(check_checkmate(chess, 1, king_x_white, king_y_white)>0){
+        return 444;
+        /*Day la nuoc co chieu tuong*/
+      }
+      else
+      {
+        return 0; 
+      }
   }
 }
 /************************************************************************/
