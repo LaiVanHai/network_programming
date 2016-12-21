@@ -173,7 +173,7 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		      printf("**ERROR** Open file error.\n");
 			      return 0;
 		    }
-		    fprintf(store_run,"%c - %d|%d -> %d|%d\n",chess[x1][y1],x,y,x1,y1);
+		    fprintf(store_run,"%c - %d,%d -> %d,%d\n",chess[x1][y1],x,y,x1,y1);
 
 
 		    fclose(store_run);

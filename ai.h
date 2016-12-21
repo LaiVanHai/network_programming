@@ -228,6 +228,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 	int king_y_white;
 	int king_x_black;
 	int king_y_black;
+	int server_warning2 =  server_warning;
 
 	chess_status2 = *chess_status;
 
@@ -237,8 +238,6 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 	king_y_white = chess_status2.king_y_white;
 
 	//printf("toa do quan tuong 2 ben la: %d %d %d %d\n",king_x_white,king_y_white,king_x_black,king_y_black);
-
-
 
 	if(color==1)
 	{
@@ -255,10 +254,11 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 			for(int j=0;j<=7;j++){
 				for(int i1=0;i1<=7;i1++){
 					for(int j1=0;j1<=7;j1++){
-						if(check_chess_run(a,color_server, i, j, i1, j1,&chess_status2)>=1){
+						if(check_chess_run(a,color_server, i, j, i1, j1, &chess_status2)>=1){
+							
 							if(color_server == 1){
 								if(check_checkmate(a,color_server, king_x_white, king_y_white)==0){
-									server_warning = 0;
+									server_warning2 = 0;
 									run_type.x = i;
 									run_type.y = j;
 									run_type.x1 = i1;
@@ -267,7 +267,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 							}
 							else{
 								if(check_checkmate(a,color_server, king_x_black, king_y_black)==0){
-									server_warning = 0;
+									server_warning2 = 0;
 									run_type.x = i;
 									run_type.y = j;
 									run_type.x1 = i1;
@@ -293,7 +293,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 
 	*check_castling = dd;
 	*chess_status = chess_status2;
-	if(server_warning == 0)
+	if(server_warning2 == 0)
 	{
 		/*Da khac che duoc nuoc chieu tuong hoac khong con bi chieu tuong nua*/
     	int checkmate_status =  check_checkmate_reverse(a, color, &chess_status2);
