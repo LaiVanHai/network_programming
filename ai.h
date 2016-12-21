@@ -230,6 +230,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 	int king_y_black;
 	int server_warning2 =  server_warning;
 
+
 	chess_status2 = *chess_status;
 
 	king_x_black = chess_status2.king_x_black;
@@ -255,7 +256,9 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 				for(int i1=0;i1<=7;i1++){
 					for(int j1=0;j1<=7;j1++){
 						if(check_chess_run(a,color_server, i, j, i1, j1, &chess_status2)>=1){
-							
+							int value2 = a[i][j];
+							a[i1][j1] = value2;
+							a[i][j] = '_';
 							if(color_server == 1){
 								if(check_checkmate(a,color_server, king_x_white, king_y_white)==0){
 									server_warning2 = 0;
@@ -274,6 +277,9 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 									run_type.y1 = j1;
 								}
 							}
+							value2 = a[i1][j1];
+							a[i][j] = value2;
+							a[i1][j1] = '_';
 						}
 					}
 				}
