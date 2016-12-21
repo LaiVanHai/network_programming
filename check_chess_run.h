@@ -22,7 +22,7 @@ int check_knight(int **chess, int color, int x, int y, int x1, int y1){
   i = y + 2;
   j = y - 2;
   if((i==y1 && i<=7 && i>=0)||(j == y1 && j<=7 && j>=0)){
-    printf("Quan ma di theo phuong ngang.\n");
+  // printf("Quan ma di theo phuong ngang.\n");
       i = x + 1;
       j = x - 1;
       if((i==x1 && i<=7 && i>=0)||(j==x1 && j<=7 && j>=0)){
@@ -35,7 +35,7 @@ int check_knight(int **chess, int color, int x, int y, int x1, int y1){
     i = x + 2;
     j = x - 2;
     if((i==x1 && i<=7 && i>=0)||(j == x1 && j<=7 && j>=0)){
-      printf("Quan ma di theo phuong doc.\n");
+    //  printf("Quan ma di theo phuong doc.\n");
       i = y + 1;
       j = y - 1;
       if((i==y1 && i<=7 && i>=0)||(j==y1 && j<=7 && j>=0)){
@@ -85,7 +85,6 @@ int check_pawn(int **chess, int color, int x, int y, int x1, int y1){
       return 0;
     else if((x-x1) == 2){
       if(y == y1 && x==6 && chess[x-1][y1] == '_' && chess[x1][y1] == '_') {     /*di chuyển dọc 2 ô*/
-        printf("vao\n");
         return 1;
       }
       else return 0;
