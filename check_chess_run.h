@@ -13,6 +13,7 @@ int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *
 int check_checkmate(int **chess, int color,  int x, int y); /*ham kiem tra chieu tuong*/
 int check_checkmate_reverse(int **chess, int color, ChessStatus *chess_status); /*Kiem tra xem nuoc co cua minh co chieu 
 tuong doi phuong khong*/
+int check_endgame(int **chess, int color);/*kiem tra quan tuong con hay khong*/
 
 
 int check_knight(int **chess, int color, int x, int y, int x1, int y1){
@@ -328,6 +329,10 @@ int check_checkmate(int **chess, int color, int x, int y){
           if(check_king(chess,color+1,i,j,x,y) == 1)
             return 1;
           break;
+        case 'm':
+          if(check_knight(chess,color+1,i,j,x,y) == 1)
+            return 1;
+          break;
         }
       }
       else {
@@ -350,6 +355,10 @@ int check_checkmate(int **chess, int color, int x, int y){
           break;
         case 'W':
           if(check_king(chess,color-1,i,j,x,y) == 1)
+            return 1;
+          break;
+           case 'M':
+          if(check_knight(chess,color-1,i,j,x,y) == 1)
             return 1;
           break;
         }
@@ -439,6 +448,23 @@ int castling(int **chess, int color, int x, int y, int x1, int y1, ChessStatus *
       else return 0;
     }
   else return 0;
+}
+
+int check_endgame(int **chess, int color){
+  int i,j;
+  for(i=0; i<=7; i++){
+    for(j=0; j<=7; j++){
+      if(color == 1){
+        if(chess[i][j] == 'W')
+          return 1;
+      }
+      else {
+        if(chess[i][j] == 'w')
+          return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 #endif

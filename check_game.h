@@ -142,7 +142,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     y1 = atoi(p); /* lay toa do cot cua nuoc toi*/ 
 	chess_status2 = *chess_status;
 	stempt = check_chess_run(chess, color, x, y, x1 , y1, &chess_status2); /*quet trang thai nuoc co*/
-	printf("Gia tri stempt: %d\n ",stempt);
+	//printf("Gia tri stempt: %d\n ",stempt);
     if(stempt > 0){ 
     	// check_run _ ai.h
     	//duong di cua phia client la hop le
@@ -165,7 +165,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     		server_warning = 1;
     	}
 
-    	printf("server_warning : %d\n",server_warning);
+    	//printf("server_warning : %d\n",server_warning);
 
     	*chess_status = chess_status2;
     	/*cap nhat lai bien luu trang thai cac quan co neu co su thay doi*/
@@ -216,9 +216,39 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
 	    	chess[x1][y1] = chess[x][y];
     		chess[x][y]= '_';
 
+    		if(chess[x1][y1]=='w'){
+    			chess_status2.king_x_black = x1;
+    			chess_status2.king_y_black = y1;
+    		}
+    		else
+    			if(chess[x1][y1]=='W'){
+    				chess_status2.king_x_white = x1;
+    				chess_status2.king_x_black = y1;
+    			}
+    		*chess_status  = chess_status2;
+
 
     		/*hien thi ban co sau khi cap nhat nuoc co cua client va server*/
     		paint(chess,color);
+    		/*kiem tra quan tuong con hay khong*/
+    			if(color == 1 ){
+    				if(check_endgame(chess,2)==0){
+    					run.status = 0; // server da bi an mat tuong
+    				}
+    			}else{
+    				if(check_endgame(chess, 1)==0){
+    					run.status = 0; //sever da bi an mat tuong
+    				}
+    			}
+    		/*kiem tra quan tuong con hay khong*/
+    		if(run.status == 0){
+    			/*server chiu thua*/
+    			strcpy(buff2,"YOU_WIN");
+    			bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
+					if(Check_Send(bytes_sent)>0){
+						return 3;
+					}
+    		}
 	    	
 	    	if(run.status == 1)
 	    	{
@@ -229,9 +259,7 @@ int Check_Run(char string[1024], int conn_sock, int **chess, int color, ChessSta
     				strcpy(buff2,"RUN_C_SERVER_CLIENT|");
 		    		strcat(buff2,buff);
 		    		bytes_sent = send(conn_sock,buff2,sizeof(buff2),0);
-					if(Check_Send(bytes_sent)>0){
-						return 3;
-					}
+					return Check_Send(bytes_sent);
     			}
     			else{
     				if(check_castling > 20){

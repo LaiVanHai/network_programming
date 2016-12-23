@@ -7,7 +7,7 @@
 #include "status_game.h"
 #include "check_game.h"
 #include "interface.h"
-#include <errno.h>
+#include <errno.h> 
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -181,10 +181,6 @@ int Check_Mess(char recv_data[1024], int conn_soc){
 		return a;
 	}
 
-	if(strcmp(p,"UPGRADE_PAWN")==0){
-
-	}
-
 	if(strcmp(p,"END_RUN")==0){
 		// nhan duoc thong bao chiu thua tu phia client
 		return End_Game(conn_soc);
@@ -341,7 +337,7 @@ int main(){
 				}
 				else{
 					recv_data[bytes_received] = '\0';
-					printf("*** From Cllient: %s\n",recv_data);
+					//printf("*** From Cllient: %s\n",recv_data);
 					if(Check_Mess(recv_data, conn_sock) <= 0){
 						close(conn_sock);
 						check_status=0;

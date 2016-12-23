@@ -271,6 +271,7 @@ RunType find_way(int **a, int color, ChessStatus *chess_status,int *check_castli
 							a[i1][j1] = value1;
 							a[i][j] = '_';
 							if(color_server == 1){
+								
 								if(check_checkmate(a,color_server, king_x_white, king_y_white)==0){
 									server_warning2 = 0;
 									run_type.x = i;

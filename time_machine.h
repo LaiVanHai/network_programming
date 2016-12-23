@@ -13,7 +13,6 @@ char* make_name_file(char s[1024], int stemp){
   stemp = 1: tao file log*/
 	char* p;
 	char result[1024];
-    printf("make time.\n");
     p = strtok(s," ");
     strcpy(result,p);
     strcat(result,"_");

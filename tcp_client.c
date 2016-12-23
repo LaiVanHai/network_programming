@@ -596,6 +596,7 @@ int printf_log(char str[1024]){
       fprintf(store_log,"%s",p);
     }
     fclose(store_log);
+    strcpy(buff,"RECV_OK");
     return 1;
 
 }
@@ -636,7 +637,7 @@ int main(){
     	exit(-1);
       }
       //buff[bytes_received] = '\0';
-      printf("***From Sever: %s\n", buff);
+      //printf("***From Sever: %s\n", buff);
       if(check_buff(buff) == 1){
         bytes_sent = send(client_sock,buff,strlen(buff),0);
         if(bytes_sent == -1){
